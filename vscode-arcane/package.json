@@ -15,13 +15,18 @@
   "activationEvents": [
     "onLanguage:arcane"
   ],
-  "main": "./out/extension.js",
+  "main": "./dist/extension.js",
   "contributes": {
     "languages": [
       {
         "id": "arcane",
-        "aliases": ["Arcane", "arcane"],
-        "extensions": [".arc"],
+        "aliases": [
+          "Arcane",
+          "arcane"
+        ],
+        "extensions": [
+          ".arc"
+        ],
         "configuration": "./language-configuration.json",
         "icon": {
           "light": "./icons/arcane.svg",
@@ -62,9 +67,12 @@
     ]
   },
   "scripts": {
-    "vscode:prepublish": "npm run compile",
+    "vscode:prepublish": "npm run esbuild-base -- --minify",
     "compile": "tsc -p ./",
-    "watch": "tsc -watch -p ./"
+    "watch": "tsc -watch -p ./",
+    "esbuild-base": "esbuild ./src/extension.ts --bundle --outfile=dist/extension.js --external:vscode --format=cjs --platform=node",
+    "esbuild": "npm run esbuild-base -- --sourcemap",
+    "esbuild-watch": "npm run esbuild-base -- --sourcemap --watch"
   },
   "dependencies": {
     "vscode-languageclient": "^9.0.1"
@@ -72,6 +80,7 @@
   "devDependencies": {
     "@types/node": "^20.0.0",
     "@types/vscode": "^1.75.0",
+    "esbuild": "^0.27.2",
     "typescript": "^5.0.0"
   },
   "repository": {
