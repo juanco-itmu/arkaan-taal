@@ -425,8 +425,26 @@ fn parse_for_diagnostics(tokens: &[Token]) -> Vec<Diagnostic> {
         j += 1;
     }
 
+    // Track if we're inside a type definition block
+    let mut in_type_def = false;
+    let mut type_def_brace_depth = 0;
+
     while i < tokens.len() {
         let token = &tokens[i];
+
+        // Track entering/exiting type definitions
+        if matches!(token.token_type, TokenType::Tipe) {
+            in_type_def = true;
+        }
+        if in_type_def && matches!(token.token_type, TokenType::LeftBrace) {
+            type_def_brace_depth += 1;
+        }
+        if type_def_brace_depth > 0 && matches!(token.token_type, TokenType::RightBrace) {
+            type_def_brace_depth -= 1;
+            if type_def_brace_depth == 0 {
+                in_type_def = false;
+            }
+        }
 
         match &token.token_type {
             TokenType::LeftParen => paren_stack.push(token),
@@ -665,6 +683,12 @@ fn parse_for_diagnostics(tokens: &[Token]) -> Vec<Diagnostic> {
                 }
             }
             TokenType::Identifier(name) => {
+                // Skip identifier checks inside type definitions (field names are not variables)
+                if type_def_brace_depth > 0 {
+                    i += 1;
+                    continue;
+                }
+
                 // Check if this identifier is used as a variable (not being declared)
                 let is_declaration = i > 0 && matches!(
                     tokens[i - 1].token_type,

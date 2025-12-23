@@ -1245,6 +1245,34 @@ impl VM {
                             self.stack.truncate(current_slots_start);
                             return Ok(result);
                         }
+                        Value::TypeConstructor(tc) => {
+                            // Type constructors just create a value and return it
+                            if arg_count != tc.arity {
+                                return Err(format!(
+                                    "Konstruktor '{}' verwag {} argumente maar het {} ontvang.",
+                                    tc.constructor_name, tc.arity, arg_count
+                                ));
+                            }
+
+                            let result = if tc.arity == 0 {
+                                Value::Adt(Rc::new(AdtInstance {
+                                    type_name: tc.type_name.clone(),
+                                    constructor_name: tc.constructor_name.clone(),
+                                    fields: Vec::new(),
+                                }))
+                            } else {
+                                let fields: Vec<Value> = self.stack[callee_idx + 1..].to_vec();
+                                Value::Adt(Rc::new(AdtInstance {
+                                    type_name: tc.type_name.clone(),
+                                    constructor_name: tc.constructor_name.clone(),
+                                    fields,
+                                }))
+                            };
+
+                            self.close_upvalues(current_slots_start);
+                            self.stack.truncate(current_slots_start);
+                            return Ok(result);
+                        }
                         _ => {
                             return Err("Kan slegs funksies oproep.".to_string());
                         }
