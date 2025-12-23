@@ -4,6 +4,10 @@ use crate::token::TokenType;
 use crate::value::{Function, TypeConstructorDef, UpvalueDescriptor, Value};
 use std::rc::Rc;
 
+// Hidden local variable names used for pattern matching
+const MATCH_SCRUTINEE: &str = "$match";
+const CTOR_HIDDEN_LOCAL: &str = "$ctor";
+
 #[derive(Debug, Clone)]
 struct Local {
     name: String,
@@ -22,6 +26,12 @@ struct CompilerUpvalue {
 enum FunctionType {
     Script,
     Function,
+}
+
+enum VarLocation {
+    Local(usize),
+    Upvalue(usize),
+    Global,
 }
 
 struct FunctionCompiler {
@@ -63,7 +73,7 @@ impl FunctionCompiler {
 pub struct Compiler {
     current: FunctionCompiler,
     enclosing: Option<Box<Compiler>>,
-    functions: Vec<Chunk>,
+    functions: Vec<Rc<Chunk>>,
 }
 
 impl Compiler {
@@ -75,7 +85,7 @@ impl Compiler {
         }
     }
 
-    pub fn compile(&mut self, statements: Vec<Stmt>) -> Result<(Chunk, Vec<Chunk>), String> {
+    pub fn compile(&mut self, statements: Vec<Stmt>) -> Result<(Chunk, Vec<Rc<Chunk>>), String> {
         for stmt in statements {
             self.compile_stmt(stmt)?;
         }
@@ -187,13 +197,33 @@ impl Compiler {
         self.current.upvalues.len() - 1
     }
 
-    fn compile_function(&mut self, name: String, params: Vec<String>, body: Vec<Stmt>) -> Result<(usize, usize, Vec<UpvalueDescriptor>), String> {
+    fn resolve_variable(&mut self, name: &str) -> VarLocation {
+        if let Some(slot) = self.resolve_local(name) {
+            VarLocation::Local(slot)
+        } else if let Some(upvalue) = self.resolve_upvalue(name) {
+            VarLocation::Upvalue(upvalue)
+        } else {
+            VarLocation::Global
+        }
+    }
+
+    /// Compiles a callable (function or lambda) with shared setup/teardown logic.
+    /// The `compile_body` closure handles the specific body compilation.
+    fn compile_callable<F>(
+        &mut self,
+        name: String,
+        params: Vec<String>,
+        compile_body: F,
+    ) -> Result<(usize, usize, Vec<UpvalueDescriptor>), String>
+    where
+        F: FnOnce(&mut Self) -> Result<(), String>,
+    {
         let arity = params.len();
 
         // Save current compiler state
         let old_current = std::mem::replace(
             &mut self.current,
-            FunctionCompiler::new(name.clone(), FunctionType::Function, arity),
+            FunctionCompiler::new(name, FunctionType::Function, arity),
         );
         let old_enclosing = self.enclosing.take();
 
@@ -212,25 +242,12 @@ impl Compiler {
             self.add_local(param, false)?;
         }
 
-        // Compile body
-        for stmt in body {
-            self.compile_stmt(stmt)?;
-        }
-
-        // Implicit nil return if no explicit return
-        let nil_idx = self.add_constant(Value::Nil);
-        self.emit(OpCode::Constant(nil_idx));
-        self.emit(OpCode::Return);
+        // Compile body using provided closure
+        compile_body(self)?;
 
         // Get the compiled function chunk and upvalue info
         let function_chunk = self.current.chunk.clone();
-        let upvalues: Vec<UpvalueDescriptor> = self.current.upvalues
-            .iter()
-            .map(|u| UpvalueDescriptor {
-                index: u.index,
-                is_local: u.is_local,
-            })
-            .collect();
+        let upvalues = self.extract_upvalues();
 
         // Restore compiler state
         if let Some(enclosing) = self.enclosing.take() {
@@ -240,9 +257,22 @@ impl Compiler {
 
         // Store the function chunk and return its index
         let func_index = self.functions.len();
-        self.functions.push(function_chunk);
+        self.functions.push(Rc::new(function_chunk));
 
         Ok((func_index, arity, upvalues))
+    }
+
+    fn compile_function(&mut self, name: String, params: Vec<String>, body: Vec<Stmt>) -> Result<(usize, usize, Vec<UpvalueDescriptor>), String> {
+        self.compile_callable(name, params, |compiler| {
+            for stmt in body {
+                compiler.compile_stmt(stmt)?;
+            }
+            // Implicit nil return if no explicit return
+            let nil_idx = compiler.add_constant(Value::Nil);
+            compiler.emit(OpCode::Constant(nil_idx));
+            compiler.emit(OpCode::Return);
+            Ok(())
+        })
     }
 
     fn compile_stmt(&mut self, stmt: Stmt) -> Result<(), String> {
@@ -354,13 +384,7 @@ impl Compiler {
                 if let Some(expr) = value {
                     // Check for tail call optimization
                     if let Expr::Call { callee, arguments } = expr {
-                        // This is a tail call - emit TailCall instead of Call + Return
-                        self.compile_expr(*callee)?;
-                        let arg_count = arguments.len();
-                        for arg in arguments {
-                            self.compile_expr(arg)?;
-                        }
-                        self.emit(OpCode::TailCall(arg_count));
+                        self.compile_tail_call(callee, arguments)?;
                     } else {
                         self.compile_expr(expr)?;
                         self.emit(OpCode::Return);
@@ -394,36 +418,27 @@ impl Compiler {
     fn compile_expr(&mut self, expr: Expr) -> Result<(), String> {
         match expr {
             Expr::Literal(lit) => {
-                let value = match lit {
-                    Literal::Number(n) => Value::Number(n),
-                    Literal::Boolean(b) => Value::Boolean(b),
-                    Literal::String(s) => Value::String(Rc::new(s)),
-                    Literal::Nil => Value::Nil,
-                };
+                let value = self.literal_to_value(&lit);
                 let idx = self.add_constant(value);
                 self.emit(OpCode::Constant(idx));
             }
             Expr::Variable(name) => {
-                if let Some(slot) = self.resolve_local(&name) {
-                    self.emit(OpCode::GetLocal(slot));
-                } else if let Some(upvalue) = self.resolve_upvalue(&name) {
-                    self.emit(OpCode::GetUpvalue(upvalue));
-                } else {
-                    self.emit(OpCode::GetGlobal(name));
-                }
+                match self.resolve_variable(&name) {
+                    VarLocation::Local(slot) => self.emit(OpCode::GetLocal(slot)),
+                    VarLocation::Upvalue(idx) => self.emit(OpCode::GetUpvalue(idx)),
+                    VarLocation::Global => self.emit(OpCode::GetGlobal(name)),
+                };
             }
             Expr::Assign { name, value } => {
                 // Check if the variable is mutable before allowing assignment
                 self.check_local_mutable(&name)?;
 
                 self.compile_expr(*value)?;
-                if let Some(slot) = self.resolve_local(&name) {
-                    self.emit(OpCode::SetLocal(slot));
-                } else if let Some(upvalue) = self.resolve_upvalue(&name) {
-                    self.emit(OpCode::SetUpvalue(upvalue));
-                } else {
-                    self.emit(OpCode::SetGlobal(name));
-                }
+                match self.resolve_variable(&name) {
+                    VarLocation::Local(slot) => self.emit(OpCode::SetLocal(slot)),
+                    VarLocation::Upvalue(idx) => self.emit(OpCode::SetUpvalue(idx)),
+                    VarLocation::Global => self.emit(OpCode::SetGlobal(name)),
+                };
             }
             Expr::Grouping(inner) => {
                 self.compile_expr(*inner)?;
@@ -489,11 +504,7 @@ impl Compiler {
                 self.compile_expr(*callee)?;
 
                 // Compile arguments
-                let arg_count = arguments.len();
-                for arg in arguments {
-                    self.compile_expr(arg)?;
-                }
-
+                let arg_count = self.compile_arguments(arguments)?;
                 self.emit(OpCode::Call(arg_count));
             }
             Expr::Lambda { params, body } => {
@@ -539,8 +550,8 @@ impl Compiler {
                 // Evaluate the value to match and store as hidden local
                 // This ensures pattern bindings have correct stack indices
                 self.compile_expr(*value)?;
-                self.add_local(String::from("$match"), false)?;
-                let scrutinee_slot = self.resolve_local("$match").unwrap();
+                self.add_local(String::from(MATCH_SCRUTINEE), false)?;
+                let scrutinee_slot = self.resolve_local(MATCH_SCRUTINEE).unwrap();
 
                 // Track jump addresses
                 let mut end_jumps = Vec::new();
@@ -569,13 +580,13 @@ impl Compiler {
                     self.emit(OpCode::SetLocal(scrutinee_slot));
                     // Pop the result from top (it's saved in slot 0)
                     self.emit(OpCode::Pop);
-                    // Pop each binding
+                    // Pop each binding manually (can't use end_scope() - need precise stack control)
                     for _ in 0..bindings {
                         self.emit(OpCode::Pop);
                         self.current.locals.pop();
                     }
                     self.current.scope_depth -= 1;
-                    // Now stack is just [result] in the scrutinee slot position
+                    // Stack is now [result] in the scrutinee slot position
 
                     // Jump to end after successful match
                     end_jumps.push(self.emit(OpCode::Jump(0)));
@@ -600,11 +611,40 @@ impl Compiler {
                     self.current.chunk.patch_jump(jump, end);
                 }
 
-                // End the outer scope - the result is now in the scrutinee slot
-                // which is the only thing on the stack at this scope level
-                // Just clean up the locals tracking
-                self.current.locals.pop();  // Remove $match from locals
+                // End the outer scope manually (can't use end_scope() - result is in scrutinee slot)
+                // The result overwrote the scrutinee, so just clean up locals tracking
+                self.current.locals.pop();
                 self.current.scope_depth -= 1;
+            }
+            Expr::IfExpr {
+                condition,
+                then_branch,
+                else_branch,
+            } => {
+                // Compile condition
+                self.compile_expr(*condition)?;
+
+                // Jump to else if false
+                let else_jump = self.emit(OpCode::JumpIfFalse(0));
+                self.emit(OpCode::Pop); // Pop condition
+
+                // Compile then branch
+                self.compile_expr(*then_branch)?;
+
+                // Jump past else branch
+                let end_jump = self.emit(OpCode::Jump(0));
+
+                // Patch else jump
+                let else_offset = self.current_offset();
+                self.current.chunk.patch_jump(else_jump, else_offset);
+                self.emit(OpCode::Pop); // Pop condition
+
+                // Compile else branch
+                self.compile_expr(*else_branch)?;
+
+                // Patch end jump
+                let end_offset = self.current_offset();
+                self.current.chunk.patch_jump(end_jump, end_offset);
             }
         }
 
@@ -654,12 +694,7 @@ impl Compiler {
                 // Duplicate scrutinee so we don't consume it during comparison
                 self.emit(OpCode::Dup);
                 // Compare with literal
-                let const_value = match lit {
-                    Literal::Number(n) => Value::Number(*n),
-                    Literal::Boolean(b) => Value::Boolean(*b),
-                    Literal::String(s) => Value::String(Rc::new(s.clone())),
-                    Literal::Nil => Value::Nil,
-                };
+                let const_value = self.literal_to_value(lit);
                 let const_idx = self.add_constant(const_value);
                 self.emit(OpCode::Constant(const_idx));
                 self.emit(OpCode::Equal);
@@ -693,8 +728,8 @@ impl Compiler {
                 } else {
                     // For multi-field constructors, save the ADT as a hidden local
                     // This ensures field extractions use correct stack indexing
-                    self.add_local(String::from("$ctor"), false)?;
-                    let ctor_slot = self.resolve_local("$ctor").unwrap();
+                    self.add_local(String::from(CTOR_HIDDEN_LOCAL), false)?;
+                    let ctor_slot = self.resolve_local(CTOR_HIDDEN_LOCAL).unwrap();
 
                     // Extract each field value and process its pattern
                     for (i, field_pattern) in fields.iter().enumerate() {
@@ -731,81 +766,31 @@ impl Compiler {
     }
 
     fn compile_lambda(&mut self, params: Vec<String>, body: LambdaBody) -> Result<(usize, usize, Vec<UpvalueDescriptor>), String> {
-        let arity = params.len();
-
-        // Save current compiler state
-        let old_current = std::mem::replace(
-            &mut self.current,
-            FunctionCompiler::new(String::from("<lambda>"), FunctionType::Function, arity),
-        );
-        let old_enclosing = self.enclosing.take();
-
-        // Create enclosing chain
-        self.enclosing = Some(Box::new(Compiler {
-            current: old_current,
-            enclosing: old_enclosing,
-            functions: Vec::new(),
-        }));
-
-        // Begin function scope
-        self.begin_scope();
-
-        // Bind parameters as locals (immutable by default)
-        for param in params {
-            self.add_local(param, false)?;
-        }
-
-        // Compile body
-        match body {
-            LambdaBody::Expr(expr) => {
-                // Single expression - implicit return
-                // Check for tail call optimization
-                if let Expr::Call { callee, arguments } = *expr {
-                    // This is a tail call
-                    self.compile_expr(*callee)?;
-                    let arg_count = arguments.len();
-                    for arg in arguments {
-                        self.compile_expr(arg)?;
+        self.compile_callable(String::from("<lambda>"), params, |compiler| {
+            match body {
+                LambdaBody::Expr(expr) => {
+                    // Single expression - implicit return
+                    // Check for tail call optimization
+                    if let Expr::Call { callee, arguments } = *expr {
+                        compiler.compile_tail_call(callee, arguments)?;
+                    } else {
+                        compiler.compile_expr(*expr)?;
+                        compiler.emit(OpCode::Return);
                     }
-                    self.emit(OpCode::TailCall(arg_count));
-                } else {
-                    self.compile_expr(*expr)?;
-                    self.emit(OpCode::Return);
+                }
+                LambdaBody::Block(stmts) => {
+                    // Block body - like a function
+                    for stmt in stmts {
+                        compiler.compile_stmt(stmt)?;
+                    }
+                    // Implicit nil return
+                    let nil_idx = compiler.add_constant(Value::Nil);
+                    compiler.emit(OpCode::Constant(nil_idx));
+                    compiler.emit(OpCode::Return);
                 }
             }
-            LambdaBody::Block(stmts) => {
-                // Block body - like a function
-                for stmt in stmts {
-                    self.compile_stmt(stmt)?;
-                }
-                // Implicit nil return
-                let nil_idx = self.add_constant(Value::Nil);
-                self.emit(OpCode::Constant(nil_idx));
-                self.emit(OpCode::Return);
-            }
-        }
-
-        // Get the compiled function chunk and upvalue info
-        let function_chunk = self.current.chunk.clone();
-        let upvalues: Vec<UpvalueDescriptor> = self.current.upvalues
-            .iter()
-            .map(|u| UpvalueDescriptor {
-                index: u.index,
-                is_local: u.is_local,
-            })
-            .collect();
-
-        // Restore compiler state
-        if let Some(enclosing) = self.enclosing.take() {
-            self.current = enclosing.current;
-            self.enclosing = enclosing.enclosing;
-        }
-
-        // Store the function chunk and return its index
-        let func_index = self.functions.len();
-        self.functions.push(function_chunk);
-
-        Ok((func_index, arity, upvalues))
+            Ok(())
+        })
     }
 
     fn emit(&mut self, op: OpCode) -> usize {
@@ -818,6 +803,40 @@ impl Compiler {
 
     fn current_offset(&self) -> usize {
         self.current.chunk.code.len()
+    }
+
+    fn literal_to_value(&self, lit: &Literal) -> Value {
+        match lit {
+            Literal::Number(n) => Value::Number(*n),
+            Literal::Boolean(b) => Value::Boolean(*b),
+            Literal::String(s) => Value::String(Rc::new(s.clone())),
+            Literal::Nil => Value::Nil,
+        }
+    }
+
+    fn extract_upvalues(&self) -> Vec<UpvalueDescriptor> {
+        self.current.upvalues
+            .iter()
+            .map(|u| UpvalueDescriptor {
+                index: u.index,
+                is_local: u.is_local,
+            })
+            .collect()
+    }
+
+    fn compile_arguments(&mut self, arguments: Vec<Expr>) -> Result<usize, String> {
+        let arg_count = arguments.len();
+        for arg in arguments {
+            self.compile_expr(arg)?;
+        }
+        Ok(arg_count)
+    }
+
+    fn compile_tail_call(&mut self, callee: Box<Expr>, arguments: Vec<Expr>) -> Result<(), String> {
+        self.compile_expr(*callee)?;
+        let arg_count = self.compile_arguments(arguments)?;
+        self.emit(OpCode::TailCall(arg_count));
+        Ok(())
     }
 }
 

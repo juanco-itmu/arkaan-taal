@@ -15,7 +15,7 @@ struct CallFrame {
 
 pub struct VM {
     chunk: Chunk,              // The main/script chunk
-    functions: Vec<Chunk>,     // Compiled function chunks
+    functions: Vec<Rc<Chunk>>, // Compiled function chunks (Rc for cheap cloning)
     frames: Vec<CallFrame>,    // Call stack
     stack: Vec<Value>,
     globals: HashMap<String, Value>,
@@ -23,7 +23,7 @@ pub struct VM {
 }
 
 impl VM {
-    pub fn new(chunk: Chunk, functions: Vec<Chunk>) -> Self {
+    pub fn new(chunk: Chunk, functions: Vec<Rc<Chunk>>) -> Self {
         let mut vm = VM {
             chunk,
             functions,
@@ -244,12 +244,12 @@ impl VM {
                 return Ok(());
             }
 
-            let instruction = chunk.code[ip].clone();
+            let instruction = &chunk.code[ip];
             ip += 1;
 
             match instruction {
                 OpCode::Constant(idx) => {
-                    let value = chunk.constants[idx].clone();
+                    let value = chunk.constants[*idx].clone();
                     self.push(value);
                 }
                 OpCode::Pop => {
@@ -258,21 +258,21 @@ impl VM {
                 OpCode::GetVar(name) | OpCode::GetGlobal(name) => {
                     let value = self
                         .globals
-                        .get(&name)
+                        .get(name)
                         .cloned()
                         .ok_or_else(|| format!("Ongedefinieerde veranderlike: '{}'", name))?;
                     self.push(value);
                 }
                 OpCode::SetVar(name) | OpCode::SetGlobal(name) => {
                     let value = self.peek()?.clone();
-                    if !self.globals.contains_key(&name) {
+                    if !self.globals.contains_key(name) {
                         return Err(format!("Ongedefinieerde veranderlike: '{}'", name));
                     }
-                    self.globals.insert(name, value);
+                    self.globals.insert(name.clone(), value);
                 }
                 OpCode::DefineGlobal(name) => {
                     let value = self.pop()?;
-                    self.globals.insert(name, value);
+                    self.globals.insert(name.clone(), value);
                 }
                 OpCode::GetLocal(slot) => {
                     let base = if self.frames.is_empty() {
@@ -280,7 +280,7 @@ impl VM {
                     } else {
                         self.frames.last().unwrap().slots_start
                     };
-                    let value = self.stack[base + slot].clone();
+                    let value = self.stack[base + *slot].clone();
                     self.push(value);
                 }
                 OpCode::SetLocal(slot) => {
@@ -290,13 +290,13 @@ impl VM {
                         self.frames.last().unwrap().slots_start
                     };
                     let value = self.peek()?.clone();
-                    self.stack[base + slot] = value;
+                    self.stack[base + *slot] = value;
                 }
                 OpCode::GetUpvalue(slot) => {
                     if let Some(frame) = self.frames.last() {
                         if let Some(ref closure) = frame.closure {
                             let value = {
-                                let upvalue = closure.upvalues[slot].borrow();
+                                let upvalue = closure.upvalues[*slot].borrow();
                                 match &upvalue.location {
                                     UpvalueLocation::Open(idx) => self.stack[*idx].clone(),
                                     UpvalueLocation::Closed(val) => val.clone(),
@@ -314,7 +314,7 @@ impl VM {
                     if let Some(frame) = self.frames.last() {
                         if let Some(ref closure) = frame.closure {
                             let value = self.peek()?.clone();
-                            let mut upvalue = closure.upvalues[slot].borrow_mut();
+                            let mut upvalue = closure.upvalues[*slot].borrow_mut();
                             match &mut upvalue.location {
                                 UpvalueLocation::Open(idx) => {
                                     self.stack[*idx] = value;
@@ -330,8 +330,8 @@ impl VM {
                         return Err("SetUpvalue called outside of function".to_string());
                     }
                 }
-                OpCode::Closure(const_idx, ref upvalue_descs) => {
-                    let value = chunk.constants[const_idx].clone();
+                OpCode::Closure(const_idx, upvalue_descs) => {
+                    let value = chunk.constants[*const_idx].clone();
                     if let Value::Function(func) = value {
                         let base = if self.frames.is_empty() {
                             0
@@ -510,21 +510,21 @@ impl VM {
                     println!("{}", value);
                 }
                 OpCode::Jump(target) => {
-                    ip = target;
+                    ip = *target;
                 }
                 OpCode::JumpIfFalse(target) => {
                     let condition = self.peek()?;
                     if !condition.is_truthy() {
-                        ip = target;
+                        ip = *target;
                     }
                 }
                 OpCode::Call(arg_count) => {
-                    let callee_idx = self.stack.len() - arg_count - 1;
+                    let callee_idx = self.stack.len() - *arg_count - 1;
                     let callee = self.stack[callee_idx].clone();
 
                     match callee {
                         Value::Function(func) => {
-                            if arg_count != func.arity {
+                            if *arg_count != func.arity {
                                 return Err(format!(
                                     "Verwag {} argumente maar het {} ontvang.",
                                     func.arity, arg_count
@@ -543,7 +543,7 @@ impl VM {
                             });
 
                             // Execute the function
-                            let result = self.run_function(&func_chunk, callee_idx, None)?;
+                            let result = self.run_function(func_chunk.clone(), callee_idx, None)?;
 
                             // Pop the call frame
                             let frame = self.frames.pop().unwrap();
@@ -556,7 +556,7 @@ impl VM {
                             self.push(result);
                         }
                         Value::Closure(closure) => {
-                            if arg_count != closure.function.arity {
+                            if *arg_count != closure.function.arity {
                                 return Err(format!(
                                     "Verwag {} argumente maar het {} ontvang.",
                                     closure.function.arity, arg_count
@@ -575,7 +575,7 @@ impl VM {
                             });
 
                             // Execute the function with closure context
-                            let result = self.run_function(&func_chunk, callee_idx, Some(Rc::clone(&closure)))?;
+                            let result = self.run_function(func_chunk.clone(), callee_idx, Some(Rc::clone(&closure)))?;
 
                             // Pop the call frame
                             let frame = self.frames.pop().unwrap();
@@ -588,7 +588,7 @@ impl VM {
                             self.push(result);
                         }
                         Value::NativeFunction(nf) => {
-                            if arg_count != nf.arity {
+                            if *arg_count != nf.arity {
                                 return Err(format!(
                                     "Verwag {} argumente maar het {} ontvang.",
                                     nf.arity, arg_count
@@ -631,7 +631,7 @@ impl VM {
                         }
                         Value::TypeConstructor(tc) => {
                             // Check arity
-                            if arg_count != tc.arity {
+                            if *arg_count != tc.arity {
                                 return Err(format!(
                                     "Konstruktor '{}' verwag {} argumente maar het {} ontvang.",
                                     tc.constructor_name, tc.arity, arg_count
@@ -668,7 +668,7 @@ impl VM {
                     return Ok(());
                 }
                 OpCode::MakeList(count) => {
-                    let start = self.stack.len() - count;
+                    let start = self.stack.len() - *count;
                     let elements: Vec<Value> = self.stack.drain(start..).collect();
                     self.push(Value::List(Rc::new(elements)));
                 }
@@ -712,11 +712,11 @@ impl VM {
                     let value = self.peek()?;
                     let matches = match value {
                         Value::Adt(adt) => {
-                            adt.constructor_name == name && adt.fields.len() == arity
+                            adt.constructor_name == *name && adt.fields.len() == *arity
                         }
                         // Unit constructors might be TypeConstructor values
                         Value::TypeConstructor(tc) => {
-                            tc.constructor_name == name && tc.arity == arity && arity == 0
+                            tc.constructor_name == *name && tc.arity == *arity && *arity == 0
                         }
                         _ => false,
                     };
@@ -726,8 +726,8 @@ impl VM {
                     let value = self.peek()?;
                     match value {
                         Value::Adt(adt) => {
-                            if index < adt.fields.len() {
-                                let field_value = adt.fields[index].clone();
+                            if *index < adt.fields.len() {
+                                let field_value = adt.fields[*index].clone();
                                 self.push(field_value);
                             } else {
                                 return Err(format!(
@@ -749,8 +749,8 @@ impl VM {
                     let value = self.pop()?;
                     match value {
                         Value::Adt(adt) => {
-                            if index < adt.fields.len() {
-                                self.push(adt.fields[index].clone());
+                            if *index < adt.fields.len() {
+                                self.push(adt.fields[*index].clone());
                             } else {
                                 return Err(format!(
                                     "Veld indeks {} buite perke vir konstruktor '{}' met {} velde.",
@@ -771,9 +771,9 @@ impl VM {
         }
     }
 
-    fn run_function(&mut self, chunk: &Chunk, slots_start: usize, closure: Option<Rc<Closure>>) -> Result<Value, String> {
+    fn run_function(&mut self, chunk: Rc<Chunk>, slots_start: usize, closure: Option<Rc<Closure>>) -> Result<Value, String> {
         // Use mutable variables to support tail call optimization
-        let mut current_chunk = chunk.clone();
+        let mut current_chunk = chunk;
         let mut current_slots_start = slots_start;
         let mut current_closure = closure;
         let mut ip = 0;
@@ -783,12 +783,12 @@ impl VM {
                 return Ok(Value::Nil);
             }
 
-            let instruction = current_chunk.code[ip].clone();
+            let instruction = &current_chunk.code[ip];
             ip += 1;
 
             match instruction {
                 OpCode::Constant(idx) => {
-                    let value = current_chunk.constants[idx].clone();
+                    let value = current_chunk.constants[*idx].clone();
                     self.push(value);
                 }
                 OpCode::Pop => {
@@ -797,34 +797,34 @@ impl VM {
                 OpCode::GetVar(name) | OpCode::GetGlobal(name) => {
                     let value = self
                         .globals
-                        .get(&name)
+                        .get(name)
                         .cloned()
                         .ok_or_else(|| format!("Ongedefinieerde veranderlike: '{}'", name))?;
                     self.push(value);
                 }
                 OpCode::SetVar(name) | OpCode::SetGlobal(name) => {
                     let value = self.peek()?.clone();
-                    if !self.globals.contains_key(&name) {
+                    if !self.globals.contains_key(name) {
                         return Err(format!("Ongedefinieerde veranderlike: '{}'", name));
                     }
-                    self.globals.insert(name, value);
+                    self.globals.insert(name.clone(), value);
                 }
                 OpCode::DefineGlobal(name) => {
                     let value = self.pop()?;
-                    self.globals.insert(name, value);
+                    self.globals.insert(name.clone(), value);
                 }
                 OpCode::GetLocal(slot) => {
-                    let value = self.stack[current_slots_start + slot].clone();
+                    let value = self.stack[current_slots_start + *slot].clone();
                     self.push(value);
                 }
                 OpCode::SetLocal(slot) => {
                     let value = self.peek()?.clone();
-                    self.stack[current_slots_start + slot] = value;
+                    self.stack[current_slots_start + *slot] = value;
                 }
                 OpCode::GetUpvalue(slot) => {
                     if let Some(ref cl) = current_closure {
                         let value = {
-                            let upvalue = cl.upvalues[slot].borrow();
+                            let upvalue = cl.upvalues[*slot].borrow();
                             match &upvalue.location {
                                 UpvalueLocation::Open(idx) => self.stack[*idx].clone(),
                                 UpvalueLocation::Closed(val) => val.clone(),
@@ -838,7 +838,7 @@ impl VM {
                 OpCode::SetUpvalue(slot) => {
                     if let Some(ref cl) = current_closure {
                         let value = self.peek()?.clone();
-                        let mut upvalue = cl.upvalues[slot].borrow_mut();
+                        let mut upvalue = cl.upvalues[*slot].borrow_mut();
                         match &mut upvalue.location {
                             UpvalueLocation::Open(idx) => {
                                 self.stack[*idx] = value;
@@ -851,8 +851,8 @@ impl VM {
                         return Err("SetUpvalue called on non-closure function".to_string());
                     }
                 }
-                OpCode::Closure(const_idx, ref upvalue_descs) => {
-                    let value = current_chunk.constants[const_idx].clone();
+                OpCode::Closure(const_idx, upvalue_descs) => {
+                    let value = current_chunk.constants[*const_idx].clone();
                     if let Value::Function(func) = value {
                         let mut upvalues = Vec::new();
                         for desc in upvalue_descs {
@@ -1021,21 +1021,21 @@ impl VM {
                     println!("{}", value);
                 }
                 OpCode::Jump(target) => {
-                    ip = target;
+                    ip = *target;
                 }
                 OpCode::JumpIfFalse(target) => {
                     let condition = self.peek()?;
                     if !condition.is_truthy() {
-                        ip = target;
+                        ip = *target;
                     }
                 }
                 OpCode::Call(arg_count) => {
-                    let callee_idx = self.stack.len() - arg_count - 1;
+                    let callee_idx = self.stack.len() - *arg_count - 1;
                     let callee = self.stack[callee_idx].clone();
 
                     match callee {
                         Value::Function(func) => {
-                            if arg_count != func.arity {
+                            if *arg_count != func.arity {
                                 return Err(format!(
                                     "Verwag {} argumente maar het {} ontvang.",
                                     func.arity, arg_count
@@ -1051,7 +1051,7 @@ impl VM {
                                 slots_start: callee_idx,
                             });
 
-                            let result = self.run_function(&func_chunk, callee_idx, None)?;
+                            let result = self.run_function(func_chunk.clone(), callee_idx, None)?;
 
                             let frame = self.frames.pop().unwrap();
                             ip = frame.ip;
@@ -1060,7 +1060,7 @@ impl VM {
                             self.push(result);
                         }
                         Value::Closure(cl) => {
-                            if arg_count != cl.function.arity {
+                            if *arg_count != cl.function.arity {
                                 return Err(format!(
                                     "Verwag {} argumente maar het {} ontvang.",
                                     cl.function.arity, arg_count
@@ -1076,7 +1076,7 @@ impl VM {
                                 slots_start: callee_idx,
                             });
 
-                            let result = self.run_function(&func_chunk, callee_idx, Some(Rc::clone(&cl)))?;
+                            let result = self.run_function(func_chunk.clone(), callee_idx, Some(Rc::clone(&cl)))?;
 
                             let frame = self.frames.pop().unwrap();
                             ip = frame.ip;
@@ -1085,7 +1085,7 @@ impl VM {
                             self.push(result);
                         }
                         Value::NativeFunction(nf) => {
-                            if arg_count != nf.arity {
+                            if *arg_count != nf.arity {
                                 return Err(format!(
                                     "Verwag {} argumente maar het {} ontvang.",
                                     nf.arity, arg_count
@@ -1128,7 +1128,7 @@ impl VM {
                         }
                         Value::TypeConstructor(tc) => {
                             // Check arity
-                            if arg_count != tc.arity {
+                            if *arg_count != tc.arity {
                                 return Err(format!(
                                     "Konstruktor '{}' verwag {} argumente maar het {} ontvang.",
                                     tc.constructor_name, tc.arity, arg_count
@@ -1174,12 +1174,12 @@ impl VM {
                 }
                 OpCode::TailCall(arg_count) => {
                     // Tail call optimization: reuse the current stack frame
-                    let callee_idx = self.stack.len() - arg_count - 1;
+                    let callee_idx = self.stack.len() - *arg_count - 1;
                     let callee = self.stack[callee_idx].clone();
 
                     match callee {
                         Value::Function(func) => {
-                            if arg_count != func.arity {
+                            if *arg_count != func.arity {
                                 return Err(format!(
                                     "Verwag {} argumente maar het {} ontvang.",
                                     func.arity, arg_count
@@ -1205,7 +1205,7 @@ impl VM {
                             // Continue the loop with the new function
                         }
                         Value::Closure(cl) => {
-                            if arg_count != cl.function.arity {
+                            if *arg_count != cl.function.arity {
                                 return Err(format!(
                                     "Verwag {} argumente maar het {} ontvang.",
                                     cl.function.arity, arg_count
@@ -1231,7 +1231,7 @@ impl VM {
                         Value::NativeFunction(nf) => {
                             // Native functions can't be tail-called in the same way,
                             // just call them and return the result
-                            if arg_count != nf.arity {
+                            if *arg_count != nf.arity {
                                 return Err(format!(
                                     "Verwag {} argumente maar het {} ontvang.",
                                     nf.arity, arg_count
@@ -1247,7 +1247,7 @@ impl VM {
                         }
                         Value::TypeConstructor(tc) => {
                             // Type constructors just create a value and return it
-                            if arg_count != tc.arity {
+                            if *arg_count != tc.arity {
                                 return Err(format!(
                                     "Konstruktor '{}' verwag {} argumente maar het {} ontvang.",
                                     tc.constructor_name, tc.arity, arg_count
@@ -1279,7 +1279,7 @@ impl VM {
                     }
                 }
                 OpCode::MakeList(count) => {
-                    let start = self.stack.len() - count;
+                    let start = self.stack.len() - *count;
                     let elements: Vec<Value> = self.stack.drain(start..).collect();
                     self.push(Value::List(Rc::new(elements)));
                 }
@@ -1322,10 +1322,10 @@ impl VM {
                     let value = self.peek()?;
                     let matches = match value {
                         Value::Adt(adt) => {
-                            adt.constructor_name == name && adt.fields.len() == arity
+                            adt.constructor_name == *name && adt.fields.len() == *arity
                         }
                         Value::TypeConstructor(tc) => {
-                            tc.constructor_name == name && tc.arity == arity && arity == 0
+                            tc.constructor_name == *name && tc.arity == *arity && *arity == 0
                         }
                         _ => false,
                     };
@@ -1335,8 +1335,8 @@ impl VM {
                     let value = self.peek()?;
                     match value {
                         Value::Adt(adt) => {
-                            if index < adt.fields.len() {
-                                let field_value = adt.fields[index].clone();
+                            if *index < adt.fields.len() {
+                                let field_value = adt.fields[*index].clone();
                                 self.push(field_value);
                             } else {
                                 return Err(format!(
@@ -1358,8 +1358,8 @@ impl VM {
                     let value = self.pop()?;
                     match value {
                         Value::Adt(adt) => {
-                            if index < adt.fields.len() {
-                                self.push(adt.fields[index].clone());
+                            if *index < adt.fields.len() {
+                                self.push(adt.fields[*index].clone());
                             } else {
                                 return Err(format!(
                                     "Veld indeks {} buite perke vir konstruktor '{}' met {} velde.",
@@ -1485,7 +1485,7 @@ impl VM {
                     slots_start: callee_idx,
                 });
 
-                let result = self.run_function(&func_chunk, callee_idx, None)?;
+                let result = self.run_function(func_chunk.clone(), callee_idx, None)?;
 
                 self.frames.pop();
                 self.stack.truncate(callee_idx);
@@ -1516,7 +1516,7 @@ impl VM {
                     slots_start: callee_idx,
                 });
 
-                let result = self.run_function(&func_chunk, callee_idx, Some(Rc::clone(&closure)))?;
+                let result = self.run_function(func_chunk.clone(), callee_idx, Some(Rc::clone(&closure)))?;
 
                 self.frames.pop();
                 self.stack.truncate(callee_idx);

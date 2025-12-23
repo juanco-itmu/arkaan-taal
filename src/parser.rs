@@ -491,6 +491,12 @@ impl Parser {
             return self.match_expr();
         }
 
+        // Inline if expression: as(condition) then_expr anders else_expr
+        if self.check(&TokenType::As) {
+            self.advance();
+            return self.if_expr();
+        }
+
         Err(format!(
             "Verwag uitdrukking op lyn {}.",
             self.peek().line
@@ -529,6 +535,24 @@ impl Parser {
         Ok(Expr::Match {
             value: Box::new(value),
             arms,
+        })
+    }
+
+    fn if_expr(&mut self) -> Result<Expr, String> {
+        self.consume(&TokenType::LeftParen, "Verwag '(' na 'as'.")?;
+        let condition = self.expression()?;
+        self.consume(&TokenType::RightParen, "Verwag ')' na voorwaarde.")?;
+
+        let then_branch = self.expression()?;
+
+        self.consume(&TokenType::Anders, "Verwag 'anders' in as-uitdrukking.")?;
+
+        let else_branch = self.expression()?;
+
+        Ok(Expr::IfExpr {
+            condition: Box::new(condition),
+            then_branch: Box::new(then_branch),
+            else_branch: Box::new(else_branch),
         })
     }
 

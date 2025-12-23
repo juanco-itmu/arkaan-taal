@@ -40,6 +40,12 @@ pub enum Expr {
         value: Box<Expr>,
         arms: Vec<MatchArm>,
     },
+    // Inline if expression: as(condition) then_expr anders else_expr
+    IfExpr {
+        condition: Box<Expr>,
+        then_branch: Box<Expr>,
+        else_branch: Box<Expr>,
+    },
 }
 
 /// Represents a type constructor definition
