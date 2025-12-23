@@ -4,10 +4,12 @@
   "scopeName": "source.arcane",
   "patterns": [
     { "include": "#comments" },
+    { "include": "#strings" },
     { "include": "#keywords" },
     { "include": "#constants" },
     { "include": "#operators" },
     { "include": "#numbers" },
+    { "include": "#type-constructors" },
     { "include": "#identifiers" },
     { "include": "#punctuation" }
   ],
@@ -20,19 +22,46 @@
         }
       ]
     },
+    "strings": {
+      "patterns": [
+        {
+          "name": "string.quoted.double.arcane",
+          "begin": "\"",
+          "end": "\"",
+          "patterns": [
+            {
+              "name": "constant.character.escape.arcane",
+              "match": "\\\\."
+            }
+          ]
+        }
+      ]
+    },
     "keywords": {
       "patterns": [
         {
           "name": "keyword.control.arcane",
-          "match": "\\b(as|anders|terwyl)\\b"
+          "match": "\\b(as|anders|terwyl|gee)\\b"
         },
         {
-          "name": "keyword.other.arcane",
-          "match": "\\b(stel)\\b"
+          "name": "keyword.control.pattern.arcane",
+          "match": "\\b(pas|geval)\\b"
+        },
+        {
+          "name": "keyword.declaration.variable.arcane",
+          "match": "\\b(stel|laat|mut)\\b"
+        },
+        {
+          "name": "keyword.declaration.function.arcane",
+          "match": "\\b(funksie|fn)\\b"
+        },
+        {
+          "name": "keyword.declaration.type.arcane",
+          "match": "\\b(tipe)\\b"
         },
         {
           "name": "support.function.builtin.arcane",
-          "match": "\\b(druk)\\b"
+          "match": "\\b(druk|kaart|filter|vou|vir_elk|lengte|kop|stert|voeg_by|is_leeg)\\b"
         }
       ]
     },
@@ -45,11 +74,19 @@
         {
           "name": "constant.language.boolean.false.arcane",
           "match": "\\b(vals)\\b"
+        },
+        {
+          "name": "constant.language.wildcard.arcane",
+          "match": "\\b_\\b"
         }
       ]
     },
     "operators": {
       "patterns": [
+        {
+          "name": "keyword.operator.arrow.arcane",
+          "match": "(=>|->)"
+        },
         {
           "name": "keyword.operator.comparison.arcane",
           "match": "(==|!=|<=|>=|<|>)"
@@ -60,7 +97,7 @@
         },
         {
           "name": "keyword.operator.arithmetic.arcane",
-          "match": "(\\+|-|\\*|/)"
+          "match": "(\\+|-|\\*|/|%)"
         },
         {
           "name": "keyword.operator.assignment.arcane",
@@ -80,11 +117,19 @@
         }
       ]
     },
+    "type-constructors": {
+      "patterns": [
+        {
+          "name": "entity.name.type.arcane",
+          "match": "\\b[A-Z][a-zA-Z0-9_]*\\b"
+        }
+      ]
+    },
     "identifiers": {
       "patterns": [
         {
           "name": "variable.other.arcane",
-          "match": "\\b[a-zA-Z_][a-zA-Z0-9_]*\\b"
+          "match": "\\b[a-z_][a-zA-Z0-9_]*\\b"
         }
       ]
     },
@@ -97,6 +142,14 @@
         {
           "name": "punctuation.definition.group.arcane",
           "match": "[()]"
+        },
+        {
+          "name": "punctuation.definition.list.arcane",
+          "match": "[\\[\\]]"
+        },
+        {
+          "name": "punctuation.separator.arcane",
+          "match": ","
         }
       ]
     }

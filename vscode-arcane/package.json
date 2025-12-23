@@ -2,8 +2,8 @@
   "name": "arcane-lang",
   "displayName": "Arcane Language",
   "description": "'n Afrikaanse programmeertaal - Syntax highlighting, snippets, and LSP",
-  "version": "0.2.0",
-  "publisher": "arcane",
+  "version": "0.3.0",
+  "publisher": "arcane-lang",
   "engines": {
     "vscode": "^1.75.0"
   },
