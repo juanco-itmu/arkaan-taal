@@ -22,7 +22,11 @@
         "id": "arcane",
         "aliases": ["Arcane", "arcane"],
         "extensions": [".arc"],
-        "configuration": "./language-configuration.json"
+        "configuration": "./language-configuration.json",
+        "icon": {
+          "light": "./icons/arcane.svg",
+          "dark": "./icons/arcane.svg"
+        }
       }
     ],
     "grammars": [
@@ -48,7 +52,14 @@
           "description": "Path to the arcane-lsp executable. Leave empty to use the bundled server."
         }
       }
-    }
+    },
+    "iconThemes": [
+      {
+        "id": "arcane-icons",
+        "label": "Arcane Icons",
+        "path": "./arcane-icon-theme.json"
+      }
+    ]
   },
   "scripts": {
     "vscode:prepublish": "npm run compile",

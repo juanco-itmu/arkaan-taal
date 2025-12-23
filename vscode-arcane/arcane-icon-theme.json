@@ -1,0 +1,14 @@
+{
+  "iconDefinitions": {
+    "_arcane": {
+      "iconPath": "./icons/arcane.svg"
+    }
+  },
+  "fileExtensions": {
+    "arc": "_arcane"
+  },
+  "fileNames": {},
+  "languageIds": {
+    "arcane": "_arcane"
+  }
+}
