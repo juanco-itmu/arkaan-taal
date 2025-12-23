@@ -1,0 +1,46 @@
+{
+  "name": "arcane-lang",
+  "displayName": "Arcane Language",
+  "description": "'n Afrikaanse programmeertaal - Syntax highlighting and snippets",
+  "version": "0.1.0",
+  "publisher": "arcane",
+  "engines": {
+    "vscode": "^1.70.0"
+  },
+  "categories": [
+    "Programming Languages",
+    "Snippets"
+  ],
+  "contributes": {
+    "languages": [
+      {
+        "id": "arcane",
+        "aliases": ["Arcane", "arcane"],
+        "extensions": [".arc"],
+        "configuration": "./language-configuration.json",
+        "icon": {
+          "light": "./icons/arcane-light.png",
+          "dark": "./icons/arcane-dark.png"
+        }
+      }
+    ],
+    "grammars": [
+      {
+        "language": "arcane",
+        "scopeName": "source.arcane",
+        "path": "./syntaxes/arcane.tmLanguage.json"
+      }
+    ],
+    "snippets": [
+      {
+        "language": "arcane",
+        "path": "./snippets/arcane.json"
+      }
+    ]
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/yourusername/arcane-lang"
+  },
+  "license": "MIT"
+}

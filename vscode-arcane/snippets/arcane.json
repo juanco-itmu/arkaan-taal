@@ -1,0 +1,79 @@
+{
+  "Variable Declaration": {
+    "prefix": "stel",
+    "body": [
+      "stel ${1:naam} = ${2:waarde}"
+    ],
+    "description": "Verklaar 'n nuwe veranderlike"
+  },
+  "Print Statement": {
+    "prefix": "druk",
+    "body": [
+      "druk(${1:waarde})"
+    ],
+    "description": "Druk 'n waarde na die konsole"
+  },
+  "If Statement": {
+    "prefix": "as",
+    "body": [
+      "as (${1:voorwaarde}) {",
+      "\t$0",
+      "}"
+    ],
+    "description": "As-stelling (if statement)"
+  },
+  "If-Else Statement": {
+    "prefix": "asanders",
+    "body": [
+      "as (${1:voorwaarde}) {",
+      "\t$2",
+      "} anders {",
+      "\t$0",
+      "}"
+    ],
+    "description": "As-anders-stelling (if-else statement)"
+  },
+  "While Loop": {
+    "prefix": "terwyl",
+    "body": [
+      "terwyl (${1:voorwaarde}) {",
+      "\t$0",
+      "}"
+    ],
+    "description": "Terwyl-lus (while loop)"
+  },
+  "True": {
+    "prefix": "waar",
+    "body": "waar",
+    "description": "Boolean waar (true)"
+  },
+  "False": {
+    "prefix": "vals",
+    "body": "vals",
+    "description": "Boolean vals (false)"
+  },
+  "For Loop (counted)": {
+    "prefix": "vir",
+    "body": [
+      "stel ${1:i} = ${2:0}",
+      "terwyl (${1:i} < ${3:10}) {",
+      "\t$0",
+      "\tstel ${1:i} = ${1:i} + 1",
+      "}"
+    ],
+    "description": "Tel-lus (counted loop using while)"
+  },
+  "Sum Pattern": {
+    "prefix": "som",
+    "body": [
+      "stel ${1:som} = 0",
+      "stel ${2:i} = ${3:1}",
+      "terwyl (${2:i} <= ${4:10}) {",
+      "\tstel ${1:som} = ${1:som} + ${2:i}",
+      "\tstel ${2:i} = ${2:i} + 1",
+      "}",
+      "druk(${1:som})"
+    ],
+    "description": "Bereken 'n som (sum pattern)"
+  }
+}
