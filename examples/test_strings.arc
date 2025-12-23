@@ -1,0 +1,4 @@
+stel naam = "Wereld"
+druk("Hallo, " + naam)
+druk(10 % 3)
+druk("String met nuwe\nlyn")

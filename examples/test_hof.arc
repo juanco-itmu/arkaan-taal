@@ -1,0 +1,72 @@
+// Test higher-order functions
+
+laat getalle = [1, 2, 3, 4, 5]
+
+// kaart (map) - double each number
+laat dubbel = fn(x) x * 2
+laat verdubbel = kaart(getalle, dubbel)
+druk(verdubbel)
+
+// kaart with inline lambda
+laat kwadrate = kaart(getalle, fn(x) x * x)
+druk(kwadrate)
+
+// filter - get even numbers
+laat is_ewe = fn(x) x % 2 == 0
+laat ewe_getalle = filter(getalle, is_ewe)
+druk(ewe_getalle)
+
+// filter with inline lambda - numbers greater than 2
+laat groter = filter(getalle, fn(x) x > 2)
+druk(groter)
+
+// vou (fold/reduce) - sum all numbers
+laat som = fn(acc, x) acc + x
+laat totaal = vou(getalle, 0, som)
+druk(totaal)
+
+// vou - multiply all numbers
+laat produk = vou(getalle, 1, fn(acc, x) acc * x)
+druk(produk)
+
+// Combine HOFs: sum of squares of even numbers
+laat ewe = filter(getalle, fn(x) x % 2 == 0)
+laat ewe_kwadrate = kaart(ewe, fn(x) x * x)
+laat som_ewe_kwadrate = vou(ewe_kwadrate, 0, fn(acc, x) acc + x)
+druk(som_ewe_kwadrate)
+
+// vir_elk - print each element
+druk("Elke element:")
+vir_elk(getalle, fn(x) {
+    druk(x)
+})
+
+// Test with closures capturing variables
+laat vermenigvuldiger = 10
+laat geskaal = kaart(getalle, fn(x) x * vermenigvuldiger)
+druk(geskaal)
+
+// Filter with closure
+laat grens = 3
+laat bokant_grens = filter(getalle, fn(x) x > grens)
+druk(bokant_grens)
+
+// Fold with closure
+laat aanvanklike = 100
+laat totaal_plus = vou(getalle, aanvanklike, fn(acc, x) acc + x)
+druk(totaal_plus)
+
+// Empty list operations
+laat leeg_lys = []
+druk(kaart(leeg_lys, fn(x) x * 2))
+druk(filter(leeg_lys, fn(x) x > 0))
+druk(vou(leeg_lys, 0, fn(acc, x) acc + x))
+
+// String lists with HOFs
+laat woorde = ["hallo", "wêreld", "arcane"]
+laat lengtes = kaart(woorde, fn(w) lengte(w))
+druk(lengtes)
+
+// Filter strings by length
+laat lang_woorde = filter(woorde, fn(w) lengte(w) > 5)
+druk(lang_woorde)
