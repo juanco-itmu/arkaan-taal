@@ -2,7 +2,7 @@
   "name": "arkaan-lang",
   "displayName": "Arkaan Language",
   "description": "'n Afrikaanse programmeertaal - Syntax highlighting, snippets, and LSP",
-  "version": "0.5.0",
+  "version": "0.6.0",
   "publisher": "arcane-lang",
   "engines": {
     "vscode": "^1.75.0"

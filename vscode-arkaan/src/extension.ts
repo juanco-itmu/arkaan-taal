@@ -37,8 +37,13 @@ export function activate(context: ExtensionContext) {
 
     if (!serverPath) {
         window.showErrorMessage(
-            'Arkaan LSP server not found. Please build it with `cargo build --release` or set arkaan.serverPath in settings.'
-        );
+            'Arkaan LSP server not found. Install it with `cargo install --git https://github.com/juanco-itmu/arkaan-taal` or set arkaan.serverPath in settings.',
+            'Open Settings'
+        ).then(selection => {
+            if (selection === 'Open Settings') {
+                require('vscode').commands.executeCommand('workbench.action.openSettings', 'arkaan.serverPath');
+            }
+        });
         return;
     }
 
