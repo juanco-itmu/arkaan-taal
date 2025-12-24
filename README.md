@@ -1,8 +1,8 @@
-# Arcane
+# Arkaan
 
 **'n Afrikaanse Programmeertaal** - A programming language with Afrikaans keywords.
 
-Arcane is a functional programming language featuring immutable-by-default variables, first-class functions, pattern matching, algebraic data types, and a stack-based virtual machine.
+Arkaan is a functional programming language featuring immutable-by-default variables, first-class functions, pattern matching, algebraic data types, and a stack-based virtual machine.
 
 ## Quick Start
 
@@ -15,8 +15,8 @@ Arcane is a functional programming language featuring immutable-by-default varia
 
 ```bash
 # Clone the repository
-git clone https://github.com/yourusername/arcane-lang.git
-cd arcane-lang
+git clone https://github.com/yourusername/arkaan-lang.git
+cd arkaan-lang
 
 # Build the interpreter and LSP server
 cargo build --release
@@ -25,8 +25,8 @@ cargo build --release
 ### Run a Program
 
 ```bash
-# Run an Arcane program
-cargo run --release -- examples/test_functions.arc
+# Run an Arkaan program
+cargo run --release -- examples/test_functions.ark
 
 # Or start the interactive REPL
 cargo run --release
@@ -36,18 +36,18 @@ cargo run --release
 
 ### Hello World
 
-```arcane
+```arkaan
 // Dit is 'n kommentaar
 druk("Hallo, Wêreld!")
 ```
 
 ### Variables
 
-Arcane uses immutable bindings by default:
+Arkaan uses immutable bindings by default:
 
-```arcane
+```arkaan
 // Immutable binding (preferred)
-laat naam = "Arcane"
+laat naam = "Arkaan"
 laat getal = 42
 
 // Mutable binding (use sparingly)
@@ -57,7 +57,7 @@ teller = teller + 1
 
 ### Functions
 
-```arcane
+```arkaan
 // Function definition
 funksie groet(naam) {
     druk("Hallo, " + naam)
@@ -86,7 +86,7 @@ druk(fakulteit(5))  // 120
 
 ### Lambda Expressions
 
-```arcane
+```arkaan
 // Simple lambda
 laat dubbel = fn(x) x * 2
 druk(dubbel(5))  // 10
@@ -104,7 +104,7 @@ druk(plus_vyf(10))  // 15
 
 ### Control Flow
 
-```arcane
+```arkaan
 // If-else
 laat x = 10
 
@@ -124,7 +124,7 @@ terwyl (teller < 5) {
 
 ### Lists
 
-```arcane
+```arkaan
 laat getalle = [1, 2, 3, 4, 5]
 
 // Access by index
@@ -146,7 +146,7 @@ laat omgekeer_lys = omgekeer(getalle)  // reverse: [5, 4, 3, 2, 1]
 
 ### Higher-Order Functions
 
-```arcane
+```arkaan
 laat getalle = [1, 2, 3, 4, 5]
 
 // Map (kaart)
@@ -169,7 +169,7 @@ vir_elk(getalle, fn(x) {
 
 ### Algebraic Data Types
 
-```arcane
+```arkaan
 // Define a type with variants
 tipe Opsie {
     Niks
@@ -189,7 +189,7 @@ druk(resultaat)  // 84
 
 ### Pattern Matching
 
-```arcane
+```arkaan
 // Binary tree type
 tipe Boom {
     Blaar(waarde)
@@ -234,12 +234,12 @@ laat resultaat = pas(Sommige(100)) {
 
 ## VS Code Extension
 
-Install the [Arcane Language extension](https://marketplace.visualstudio.com/items?itemName=arcane-lang.arcane-lang) from the VS Code Marketplace for syntax highlighting, code snippets, and LSP features (completions, hover, diagnostics).
+Install the [Arkaan Language extension](https://marketplace.visualstudio.com/items?itemName=arkaan-lang.arkaan-lang) from the VS Code Marketplace for syntax highlighting, code snippets, and LSP features (completions, hover, diagnostics).
 
 ## Project Structure
 
 ```
-arcane-lang/
+arkaan-lang/
 ├── src/
 │   ├── main.rs        # CLI entry point & REPL
 │   ├── token.rs       # Token definitions
@@ -259,15 +259,15 @@ arcane-lang/
 
 ## Examples
 
-Run the example programs to see Arcane in action:
+Run the example programs to see Arkaan in action:
 
 ```bash
-cargo run --release -- examples/test_functions.arc   # Functions & recursion
-cargo run --release -- examples/test_lambdas.arc     # Lambda expressions
-cargo run --release -- examples/test_lists.arc       # List operations
-cargo run --release -- examples/test_hof.arc         # Higher-order functions
-cargo run --release -- examples/test_pattern.arc     # Pattern matching
-cargo run --release -- examples/test_adt.arc         # Algebraic data types
+cargo run --release -- examples/test_functions.ark   # Functions & recursion
+cargo run --release -- examples/test_lambdas.ark     # Lambda expressions
+cargo run --release -- examples/test_lists.ark       # List operations
+cargo run --release -- examples/test_hof.ark         # Higher-order functions
+cargo run --release -- examples/test_pattern.ark     # Pattern matching
+cargo run --release -- examples/test_adt.ark         # Algebraic data types
 ```
 
 ## License

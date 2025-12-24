@@ -12,23 +12,23 @@ let client: LanguageClient;
 
 export function activate(context: ExtensionContext) {
     // Get the server path from settings or use default
-    const config = workspace.getConfiguration('arcane');
+    const config = workspace.getConfiguration('arkaan');
     let serverPath = config.get<string>('serverPath');
 
     if (!serverPath || serverPath === '') {
         // Try to find the server in common locations
         const possiblePaths = [
             // Development: built with cargo
-            path.join(context.extensionPath, '..', 'target', 'release', 'arcane-lsp'),
-            path.join(context.extensionPath, '..', 'target', 'debug', 'arcane-lsp'),
+            path.join(context.extensionPath, '..', 'target', 'release', 'arkaan-lsp'),
+            path.join(context.extensionPath, '..', 'target', 'debug', 'arkaan-lsp'),
             // Installed globally
-            'arcane-lsp',
+            'arkaan-lsp',
             // In the extension folder
-            path.join(context.extensionPath, 'bin', 'arcane-lsp'),
+            path.join(context.extensionPath, 'bin', 'arkaan-lsp'),
         ];
 
         for (const p of possiblePaths) {
-            if (p === 'arcane-lsp' || fs.existsSync(p)) {
+            if (p === 'arkaan-lsp' || fs.existsSync(p)) {
                 serverPath = p;
                 break;
             }
@@ -37,7 +37,7 @@ export function activate(context: ExtensionContext) {
 
     if (!serverPath) {
         window.showErrorMessage(
-            'Arcane LSP server not found. Please build it with `cargo build --release` or set arcane.serverPath in settings.'
+            'Arkaan LSP server not found. Please build it with `cargo build --release` or set arkaan.serverPath in settings.'
         );
         return;
     }
@@ -55,15 +55,15 @@ export function activate(context: ExtensionContext) {
     };
 
     const clientOptions: LanguageClientOptions = {
-        documentSelector: [{ scheme: 'file', language: 'arcane' }],
+        documentSelector: [{ scheme: 'file', language: 'arkaan' }],
         synchronize: {
-            fileEvents: workspace.createFileSystemWatcher('**/*.arc'),
+            fileEvents: workspace.createFileSystemWatcher('**/*.ark'),
         },
     };
 
     client = new LanguageClient(
-        'arcaneLsp',
-        'Arcane Language Server',
+        'arkaanLsp',
+        'Arkaan Language Server',
         serverOptions,
         clientOptions
     );

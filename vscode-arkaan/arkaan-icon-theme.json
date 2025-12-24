@@ -1,14 +1,14 @@
 {
   "iconDefinitions": {
-    "_arcane": {
-      "iconPath": "./icons/arcane.svg"
+    "_arkaan": {
+      "iconPath": "./icons/arkaan.svg"
     }
   },
   "fileExtensions": {
-    "arc": "_arcane"
+    "ark": "_arkaan"
   },
   "fileNames": {},
   "languageIds": {
-    "arcane": "_arcane"
+    "arkaan": "_arkaan"
   }
 }

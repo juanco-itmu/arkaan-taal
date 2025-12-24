@@ -9,14 +9,14 @@ mod analysis;
 
 use analysis::{analyze_document, get_completions, get_hover_info};
 
-struct ArcaneLanguageServer {
+struct ArkaanLanguageServer {
     client: Client,
     documents: RwLock<HashMap<Url, String>>,
 }
 
-impl ArcaneLanguageServer {
+impl ArkaanLanguageServer {
     fn new(client: Client) -> Self {
-        ArcaneLanguageServer {
+        ArkaanLanguageServer {
             client,
             documents: RwLock::new(HashMap::new()),
         }
@@ -31,7 +31,7 @@ impl ArcaneLanguageServer {
 }
 
 #[tower_lsp::async_trait]
-impl LanguageServer for ArcaneLanguageServer {
+impl LanguageServer for ArkaanLanguageServer {
     async fn initialize(&self, _: InitializeParams) -> Result<InitializeResult> {
         Ok(InitializeResult {
             capabilities: ServerCapabilities {
@@ -46,7 +46,7 @@ impl LanguageServer for ArcaneLanguageServer {
                 ..Default::default()
             },
             server_info: Some(ServerInfo {
-                name: "Arcane Language Server".to_string(),
+                name: "Arkaan Language Server".to_string(),
                 version: Some("0.1.0".to_string()),
             }),
         })
@@ -54,7 +54,7 @@ impl LanguageServer for ArcaneLanguageServer {
 
     async fn initialized(&self, _: InitializedParams) {
         self.client
-            .log_message(MessageType::INFO, "Arcane LSP geïnisialiseer!")
+            .log_message(MessageType::INFO, "Arkaan LSP geïnisialiseer!")
             .await;
     }
 
@@ -121,6 +121,6 @@ async fn main() {
     let stdin = tokio::io::stdin();
     let stdout = tokio::io::stdout();
 
-    let (service, socket) = LspService::new(ArcaneLanguageServer::new);
+    let (service, socket) = LspService::new(ArkaanLanguageServer::new);
     Server::new(stdin, stdout, socket).serve(service).await;
 }

@@ -1,15 +1,15 @@
 [package]
-name = "arcane-lang"
+name = "arkaan-lang"
 version = "0.1.0"
 edition = "2021"
 description = "A programming language with Afrikaans keywords"
 
 [[bin]]
-name = "arcane"
+name = "arkaan"
 path = "src/main.rs"
 
 [[bin]]
-name = "arcane-lsp"
+name = "arkaan-lsp"
 path = "src/lsp/main.rs"
 
 [dependencies]

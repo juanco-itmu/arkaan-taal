@@ -42,28 +42,28 @@ const node_1 = require("vscode-languageclient/node");
 let client;
 function activate(context) {
     // Get the server path from settings or use default
-    const config = vscode_1.workspace.getConfiguration('arcane');
+    const config = vscode_1.workspace.getConfiguration('arkaan');
     let serverPath = config.get('serverPath');
     if (!serverPath || serverPath === '') {
         // Try to find the server in common locations
         const possiblePaths = [
             // Development: built with cargo
-            path.join(context.extensionPath, '..', 'target', 'release', 'arcane-lsp'),
-            path.join(context.extensionPath, '..', 'target', 'debug', 'arcane-lsp'),
+            path.join(context.extensionPath, '..', 'target', 'release', 'arkaan-lsp'),
+            path.join(context.extensionPath, '..', 'target', 'debug', 'arkaan-lsp'),
             // Installed globally
-            'arcane-lsp',
+            'arkaan-lsp',
             // In the extension folder
-            path.join(context.extensionPath, 'bin', 'arcane-lsp'),
+            path.join(context.extensionPath, 'bin', 'arkaan-lsp'),
         ];
         for (const p of possiblePaths) {
-            if (p === 'arcane-lsp' || fs.existsSync(p)) {
+            if (p === 'arkaan-lsp' || fs.existsSync(p)) {
                 serverPath = p;
                 break;
             }
         }
     }
     if (!serverPath) {
-        vscode_1.window.showErrorMessage('Arcane LSP server not found. Please build it with `cargo build --release` or set arcane.serverPath in settings.');
+        vscode_1.window.showErrorMessage('Arkaan LSP server not found. Please build it with `cargo build --release` or set arkaan.serverPath in settings.');
         return;
     }
     const serverExecutable = {
@@ -77,12 +77,12 @@ function activate(context) {
         debug: serverExecutable,
     };
     const clientOptions = {
-        documentSelector: [{ scheme: 'file', language: 'arcane' }],
+        documentSelector: [{ scheme: 'file', language: 'arkaan' }],
         synchronize: {
-            fileEvents: vscode_1.workspace.createFileSystemWatcher('**/*.arc'),
+            fileEvents: vscode_1.workspace.createFileSystemWatcher('**/*.ark'),
         },
     };
-    client = new node_1.LanguageClient('arcaneLsp', 'Arcane Language Server', serverOptions, clientOptions);
+    client = new node_1.LanguageClient('arkaanLsp', 'Arkaan Language Server', serverOptions, clientOptions);
     // Start the client (and server)
     client.start();
     context.subscriptions.push({

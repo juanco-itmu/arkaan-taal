@@ -245,7 +245,7 @@ impl Lexer {
                     end: Position { line: self.line, character: self.col },
                 },
                 severity: Some(DiagnosticSeverity::ERROR),
-                source: Some("arcane".to_string()),
+                source: Some("arkaan".to_string()),
                 message: "Onbeeindigde string - verwag '\"'".to_string(),
                 ..Default::default()
             });
@@ -305,7 +305,7 @@ impl Lexer {
                 end: Position { line: self.line, character: self.col },
             },
             severity: Some(DiagnosticSeverity::ERROR),
-            source: Some("arcane".to_string()),
+            source: Some("arkaan".to_string()),
             message: message.to_string(),
             ..Default::default()
         }
@@ -480,7 +480,7 @@ fn parse_for_diagnostics(tokens: &[Token]) -> Vec<Diagnostic> {
                             end: Position { line: token.line, character: token.end_col },
                         },
                         severity: Some(DiagnosticSeverity::ERROR),
-                        source: Some("arcane".to_string()),
+                        source: Some("arkaan".to_string()),
                         message: "Ongepaarde ')' - geen ooreenstemmende '(' gevind".to_string(),
                         ..Default::default()
                     });
@@ -495,7 +495,7 @@ fn parse_for_diagnostics(tokens: &[Token]) -> Vec<Diagnostic> {
                             end: Position { line: token.line, character: token.end_col },
                         },
                         severity: Some(DiagnosticSeverity::ERROR),
-                        source: Some("arcane".to_string()),
+                        source: Some("arkaan".to_string()),
                         message: "Ongepaarde '}' - geen ooreenstemmende '{' gevind".to_string(),
                         ..Default::default()
                     });
@@ -510,7 +510,7 @@ fn parse_for_diagnostics(tokens: &[Token]) -> Vec<Diagnostic> {
                             end: Position { line: token.line, character: token.end_col },
                         },
                         severity: Some(DiagnosticSeverity::ERROR),
-                        source: Some("arcane".to_string()),
+                        source: Some("arkaan".to_string()),
                         message: "Ongepaarde ']' - geen ooreenstemmende '[' gevind".to_string(),
                         ..Default::default()
                     });
@@ -526,7 +526,7 @@ fn parse_for_diagnostics(tokens: &[Token]) -> Vec<Diagnostic> {
                                 end: Position { line: token.line, character: token.end_col },
                             },
                             severity: Some(DiagnosticSeverity::ERROR),
-                            source: Some("arcane".to_string()),
+                            source: Some("arkaan".to_string()),
                             message: "Verwag veranderlike naam na 'stel'".to_string(),
                             ..Default::default()
                         });
@@ -537,7 +537,7 @@ fn parse_for_diagnostics(tokens: &[Token]) -> Vec<Diagnostic> {
                                 end: Position { line: tokens[i + 1].line, character: tokens[i + 1].end_col + 1 },
                             },
                             severity: Some(DiagnosticSeverity::ERROR),
-                            source: Some("arcane".to_string()),
+                            source: Some("arkaan".to_string()),
                             message: "Verwag '=' na veranderlike naam".to_string(),
                             ..Default::default()
                         });
@@ -562,7 +562,7 @@ fn parse_for_diagnostics(tokens: &[Token]) -> Vec<Diagnostic> {
                                 end: Position { line: token.line, character: token.end_col },
                             },
                             severity: Some(DiagnosticSeverity::ERROR),
-                            source: Some("arcane".to_string()),
+                            source: Some("arkaan".to_string()),
                             message: "Verwag veranderlike naam na 'laat' (of 'laat mut')".to_string(),
                             ..Default::default()
                         });
@@ -575,7 +575,7 @@ fn parse_for_diagnostics(tokens: &[Token]) -> Vec<Diagnostic> {
                                 end: Position { line: tokens[next_idx].line, character: tokens[next_idx].end_col + 1 },
                             },
                             severity: Some(DiagnosticSeverity::ERROR),
-                            source: Some("arcane".to_string()),
+                            source: Some("arkaan".to_string()),
                             message: "Verwag '=' na veranderlike naam".to_string(),
                             ..Default::default()
                         });
@@ -592,7 +592,7 @@ fn parse_for_diagnostics(tokens: &[Token]) -> Vec<Diagnostic> {
                                 end: Position { line: token.line, character: token.end_col + 1 },
                             },
                             severity: Some(DiagnosticSeverity::ERROR),
-                            source: Some("arcane".to_string()),
+                            source: Some("arkaan".to_string()),
                             message: "Verwag funksie naam na 'funksie'".to_string(),
                             ..Default::default()
                         });
@@ -605,7 +605,7 @@ fn parse_for_diagnostics(tokens: &[Token]) -> Vec<Diagnostic> {
                                 end: Position { line: tokens[i + 1].line, character: tokens[i + 1].end_col + 1 },
                             },
                             severity: Some(DiagnosticSeverity::ERROR),
-                            source: Some("arcane".to_string()),
+                            source: Some("arkaan".to_string()),
                             message: "Verwag '(' na funksie naam".to_string(),
                             ..Default::default()
                         });
@@ -623,7 +623,7 @@ fn parse_for_diagnostics(tokens: &[Token]) -> Vec<Diagnostic> {
                             end: Position { line: token.line, character: token.end_col + 1 },
                         },
                         severity: Some(DiagnosticSeverity::ERROR),
-                        source: Some("arcane".to_string()),
+                        source: Some("arkaan".to_string()),
                         message: "Verwag '(' na 'fn'".to_string(),
                         ..Default::default()
                     });
@@ -640,7 +640,7 @@ fn parse_for_diagnostics(tokens: &[Token]) -> Vec<Diagnostic> {
                             end: Position { line: token.line, character: token.end_col + 1 },
                         },
                         severity: Some(DiagnosticSeverity::ERROR),
-                        source: Some("arcane".to_string()),
+                        source: Some("arkaan".to_string()),
                         message: "Verwag '(' na 'pas'".to_string(),
                         ..Default::default()
                     });
@@ -656,7 +656,7 @@ fn parse_for_diagnostics(tokens: &[Token]) -> Vec<Diagnostic> {
                                 end: Position { line: token.line, character: token.end_col + 1 },
                             },
                             severity: Some(DiagnosticSeverity::ERROR),
-                            source: Some("arcane".to_string()),
+                            source: Some("arkaan".to_string()),
                             message: "Verwag tipe naam na 'tipe'".to_string(),
                             ..Default::default()
                         });
@@ -669,7 +669,7 @@ fn parse_for_diagnostics(tokens: &[Token]) -> Vec<Diagnostic> {
                                 end: Position { line: tokens[i + 1].line, character: tokens[i + 1].end_col + 1 },
                             },
                             severity: Some(DiagnosticSeverity::ERROR),
-                            source: Some("arcane".to_string()),
+                            source: Some("arkaan".to_string()),
                             message: "Verwag '{' na tipe naam".to_string(),
                             ..Default::default()
                         });
@@ -685,7 +685,7 @@ fn parse_for_diagnostics(tokens: &[Token]) -> Vec<Diagnostic> {
                             end: Position { line: tokens[i + 1].line, character: tokens[i + 1].end_col },
                         },
                         severity: Some(DiagnosticSeverity::ERROR),
-                        source: Some("arcane".to_string()),
+                        source: Some("arkaan".to_string()),
                         message: "Moenie hakies gebruik na 'as' nie. Skryf: as voorwaarde { ... }".to_string(),
                         ..Default::default()
                     });
@@ -700,7 +700,7 @@ fn parse_for_diagnostics(tokens: &[Token]) -> Vec<Diagnostic> {
                             end: Position { line: token.line, character: token.end_col + 1 },
                         },
                         severity: Some(DiagnosticSeverity::ERROR),
-                        source: Some("arcane".to_string()),
+                        source: Some("arkaan".to_string()),
                         message: "Verwag '(' na 'terwyl'".to_string(),
                         ..Default::default()
                     });
@@ -715,7 +715,7 @@ fn parse_for_diagnostics(tokens: &[Token]) -> Vec<Diagnostic> {
                             end: Position { line: token.line, character: token.end_col + 1 },
                         },
                         severity: Some(DiagnosticSeverity::ERROR),
-                        source: Some("arcane".to_string()),
+                        source: Some("arkaan".to_string()),
                         message: "Verwag '(' na 'druk'".to_string(),
                         ..Default::default()
                     });
@@ -757,7 +757,7 @@ fn parse_for_diagnostics(tokens: &[Token]) -> Vec<Diagnostic> {
                                 end: Position { line: token.line, character: token.end_col },
                             },
                             severity: Some(DiagnosticSeverity::WARNING), // Warning, not error
-                            source: Some("arcane".to_string()),
+                            source: Some("arkaan".to_string()),
                             message: format!("Moontlike onbekende funksie: '{}'. Is dit gedefinieer?", name),
                             ..Default::default()
                         });
@@ -770,7 +770,7 @@ fn parse_for_diagnostics(tokens: &[Token]) -> Vec<Diagnostic> {
                                 end: Position { line: token.line, character: token.end_col },
                             },
                             severity: Some(DiagnosticSeverity::ERROR),
-                            source: Some("arcane".to_string()),
+                            source: Some("arkaan".to_string()),
                             message: format!("Ongedefinieerde veranderlike: '{}'", name),
                             ..Default::default()
                         });
@@ -791,7 +791,7 @@ fn parse_for_diagnostics(tokens: &[Token]) -> Vec<Diagnostic> {
                 end: Position { line: token.line, character: token.end_col },
             },
             severity: Some(DiagnosticSeverity::ERROR),
-            source: Some("arcane".to_string()),
+            source: Some("arkaan".to_string()),
             message: "Ongeslote '(' - verwag ')'".to_string(),
             ..Default::default()
         });
@@ -804,7 +804,7 @@ fn parse_for_diagnostics(tokens: &[Token]) -> Vec<Diagnostic> {
                 end: Position { line: token.line, character: token.end_col },
             },
             severity: Some(DiagnosticSeverity::ERROR),
-            source: Some("arcane".to_string()),
+            source: Some("arkaan".to_string()),
             message: "Ongeslote '{' - verwag '}'".to_string(),
             ..Default::default()
         });
@@ -817,7 +817,7 @@ fn parse_for_diagnostics(tokens: &[Token]) -> Vec<Diagnostic> {
                 end: Position { line: token.line, character: token.end_col },
             },
             severity: Some(DiagnosticSeverity::ERROR),
-            source: Some("arcane".to_string()),
+            source: Some("arkaan".to_string()),
             message: "Ongeslote '[' - verwag ']'".to_string(),
             ..Default::default()
         });
@@ -848,23 +848,23 @@ pub fn get_hover_info(text: &str, position: Position) -> Option<Hover> {
         {
             let info = match &token.token_type {
                 TokenType::Stel => Some((
-                    "**stel** (sleutelwoord)\n\nVerklaar 'n nuwe veranderlike.\n\n```arcane\nstel x = 10\n```",
+                    "**stel** (sleutelwoord)\n\nVerklaar 'n nuwe veranderlike.\n\n```arkaan\nstel x = 10\n```",
                     "Declare a new variable"
                 )),
                 TokenType::As => Some((
-                    "**as** (sleutelwoord)\n\nVoorwaardelike stelling (if statement).\n\n```arcane\nas x > 5 {\n    druk(x)\n}\n```",
+                    "**as** (sleutelwoord)\n\nVoorwaardelike stelling (if statement).\n\n```arkaan\nas x > 5 {\n    druk(x)\n}\n```",
                     "Conditional statement (if)"
                 )),
                 TokenType::Anders => Some((
-                    "**anders** (sleutelwoord)\n\nAlternatiewe tak van 'as' stelling.\n\n```arcane\nas x > 5 {\n    druk(\"groot\")\n} anders {\n    druk(\"klein\")\n}\n```",
+                    "**anders** (sleutelwoord)\n\nAlternatiewe tak van 'as' stelling.\n\n```arkaan\nas x > 5 {\n    druk(\"groot\")\n} anders {\n    druk(\"klein\")\n}\n```",
                     "Else branch"
                 )),
                 TokenType::Terwyl => Some((
-                    "**terwyl** (sleutelwoord)\n\nHerhaal terwyl voorwaarde waar is.\n\n```arcane\nterwyl (x > 0) {\n    druk(x)\n    stel x = x - 1\n}\n```",
+                    "**terwyl** (sleutelwoord)\n\nHerhaal terwyl voorwaarde waar is.\n\n```arkaan\nterwyl (x > 0) {\n    druk(x)\n    stel x = x - 1\n}\n```",
                     "While loop"
                 )),
                 TokenType::Druk => Some((
-                    "**druk** (funksie)\n\nDruk 'n waarde na die konsole.\n\n```arcane\ndruk(42)\ndruk(waar)\n```",
+                    "**druk** (funksie)\n\nDruk 'n waarde na die konsole.\n\n```arkaan\ndruk(42)\ndruk(waar)\n```",
                     "Print to console"
                 )),
                 TokenType::Waar => Some((
@@ -876,85 +876,85 @@ pub fn get_hover_info(text: &str, position: Position) -> Option<Hover> {
                     "Boolean false"
                 )),
                 TokenType::Funksie => Some((
-                    "**funksie** (sleutelwoord)\n\nDefinieer 'n funksie.\n\n```arcane\nfunksie groet(naam) {\n    druk(\"Hallo \" + naam)\n}\n```",
+                    "**funksie** (sleutelwoord)\n\nDefinieer 'n funksie.\n\n```arkaan\nfunksie groet(naam) {\n    druk(\"Hallo \" + naam)\n}\n```",
                     "Define a function"
                 )),
                 TokenType::Fn => Some((
-                    "**fn** (sleutelwoord)\n\nSkep 'n anonieme funksie (lambda).\n\n```arcane\nlaat dubbel = fn(x) x * 2\n```",
+                    "**fn** (sleutelwoord)\n\nSkep 'n anonieme funksie (lambda).\n\n```arkaan\nlaat dubbel = fn(x) x * 2\n```",
                     "Create anonymous function (lambda)"
                 )),
                 TokenType::Gee => Some((
-                    "**gee** (sleutelwoord)\n\nGee 'n waarde terug uit 'n funksie.\n\n```arcane\nfunksie kwadraat(x) {\n    gee x * x\n}\n```",
+                    "**gee** (sleutelwoord)\n\nGee 'n waarde terug uit 'n funksie.\n\n```arkaan\nfunksie kwadraat(x) {\n    gee x * x\n}\n```",
                     "Return value from function"
                 )),
                 TokenType::Laat => Some((
-                    "**laat** (sleutelwoord)\n\nVerklaar 'n onveranderlike veranderlike.\n\n```arcane\nlaat x = 42\n```",
+                    "**laat** (sleutelwoord)\n\nVerklaar 'n onveranderlike veranderlike.\n\n```arkaan\nlaat x = 42\n```",
                     "Declare immutable variable"
                 )),
                 TokenType::Mut => Some((
-                    "**mut** (sleutelwoord)\n\nVerklaar 'n veranderlike wat kan verander (gebruik met laat).\n\n```arcane\nlaat mut teller = 0\n```",
+                    "**mut** (sleutelwoord)\n\nVerklaar 'n veranderlike wat kan verander (gebruik met laat).\n\n```arkaan\nlaat mut teller = 0\n```",
                     "Declare mutable variable"
                 )),
                 TokenType::Pas => Some((
-                    "**pas** (sleutelwoord)\n\nPatroon-passing uitdrukking.\n\n```arcane\npas(waarde) {\n    geval Sommige(x) => x\n    geval Niks => 0\n}\n```",
+                    "**pas** (sleutelwoord)\n\nPatroon-passing uitdrukking.\n\n```arkaan\npas(waarde) {\n    geval Sommige(x) => x\n    geval Niks => 0\n}\n```",
                     "Pattern matching expression"
                 )),
                 TokenType::Geval => Some((
-                    "**geval** (sleutelwoord)\n\n'n Arm in 'n pas-uitdrukking.\n\n```arcane\ngeval Sommige(x) => x * 2\n```",
+                    "**geval** (sleutelwoord)\n\n'n Arm in 'n pas-uitdrukking.\n\n```arkaan\ngeval Sommige(x) => x * 2\n```",
                     "Match arm in pattern matching"
                 )),
                 TokenType::Tipe => Some((
-                    "**tipe** (sleutelwoord)\n\nDefinieer 'n algebraïese datatipe.\n\n```arcane\ntipe Opsie {\n    Niks\n    Sommige(waarde)\n}\n```",
+                    "**tipe** (sleutelwoord)\n\nDefinieer 'n algebraïese datatipe.\n\n```arkaan\ntipe Opsie {\n    Niks\n    Sommige(waarde)\n}\n```",
                     "Define algebraic data type"
                 )),
                 TokenType::Identifier(name) => {
                     match name.as_str() {
                         "kaart" => Some((
-                            "**kaart** (funksie)\n\nPas 'n funksie op elke element van 'n lys toe (map).\n\n```arcane\nlaat dubbel = kaart([1, 2, 3], fn(x) x * 2)\n// Resultaat: [2, 4, 6]\n```",
+                            "**kaart** (funksie)\n\nPas 'n funksie op elke element van 'n lys toe (map).\n\n```arkaan\nlaat dubbel = kaart([1, 2, 3], fn(x) x * 2)\n// Resultaat: [2, 4, 6]\n```",
                             "Apply function to each element (map)"
                         )),
                         "filter" => Some((
-                            "**filter** (funksie)\n\nFiltreer elemente wat aan 'n predikaat voldoen.\n\n```arcane\nlaat ewe = filter([1, 2, 3, 4], fn(x) x % 2 == 0)\n// Resultaat: [2, 4]\n```",
+                            "**filter** (funksie)\n\nFiltreer elemente wat aan 'n predikaat voldoen.\n\n```arkaan\nlaat ewe = filter([1, 2, 3, 4], fn(x) x % 2 == 0)\n// Resultaat: [2, 4]\n```",
                             "Filter elements matching predicate"
                         )),
                         "vou" => Some((
-                            "**vou** (funksie)\n\nVou 'n lys tot 'n enkele waarde (fold/reduce).\n\n```arcane\nlaat som = vou([1, 2, 3], 0, fn(acc, x) acc + x)\n// Resultaat: 6\n```",
+                            "**vou** (funksie)\n\nVou 'n lys tot 'n enkele waarde (fold/reduce).\n\n```arkaan\nlaat som = vou([1, 2, 3], 0, fn(acc, x) acc + x)\n// Resultaat: 6\n```",
                             "Fold list to single value (reduce)"
                         )),
                         "vir_elk" => Some((
-                            "**vir_elk** (funksie)\n\nVoer 'n aksie uit vir elke element.\n\n```arcane\nvir_elk([1, 2, 3], fn(x) druk(x))\n```",
+                            "**vir_elk** (funksie)\n\nVoer 'n aksie uit vir elke element.\n\n```arkaan\nvir_elk([1, 2, 3], fn(x) druk(x))\n```",
                             "Execute action for each element (forEach)"
                         )),
                         "lengte" => Some((
-                            "**lengte** (funksie)\n\nGee die lengte van 'n lys of string.\n\n```arcane\ndruk(lengte([1, 2, 3]))  // 3\ndruk(lengte(\"hallo\"))   // 5\n```",
+                            "**lengte** (funksie)\n\nGee die lengte van 'n lys of string.\n\n```arkaan\ndruk(lengte([1, 2, 3]))  // 3\ndruk(lengte(\"hallo\"))   // 5\n```",
                             "Get length of list or string"
                         )),
                         "kop" => Some((
-                            "**kop** (funksie)\n\nGee die eerste element van 'n lys.\n\n```arcane\ndruk(kop([1, 2, 3]))  // 1\n```",
+                            "**kop** (funksie)\n\nGee die eerste element van 'n lys.\n\n```arkaan\ndruk(kop([1, 2, 3]))  // 1\n```",
                             "Get first element (head)"
                         )),
                         "stert" => Some((
-                            "**stert** (funksie)\n\nGee alles behalwe die eerste element.\n\n```arcane\ndruk(stert([1, 2, 3]))  // [2, 3]\n```",
+                            "**stert** (funksie)\n\nGee alles behalwe die eerste element.\n\n```arkaan\ndruk(stert([1, 2, 3]))  // [2, 3]\n```",
                             "Get all but first element (tail)"
                         )),
                         "leeg" => Some((
-                            "**leeg** (funksie)\n\nKyk of 'n lys leeg is.\n\n```arcane\ndruk(leeg([]))      // waar\ndruk(leeg([1, 2]))  // vals\n```",
+                            "**leeg** (funksie)\n\nKyk of 'n lys leeg is.\n\n```arkaan\ndruk(leeg([]))      // waar\ndruk(leeg([1, 2]))  // vals\n```",
                             "Check if list is empty"
                         )),
                         "voeg_by" => Some((
-                            "**voeg_by** (funksie)\n\nVoeg 'n element voor 'n lys by (prepend).\n\n```arcane\ndruk(voeg_by(0, [1, 2, 3]))  // [0, 1, 2, 3]\n```",
+                            "**voeg_by** (funksie)\n\nVoeg 'n element voor 'n lys by (prepend).\n\n```arkaan\ndruk(voeg_by(0, [1, 2, 3]))  // [0, 1, 2, 3]\n```",
                             "Prepend element to list"
                         )),
                         "heg_aan" => Some((
-                            "**heg_aan** (funksie)\n\nVoeg 'n element aan die einde van 'n lys (append).\n\n```arcane\ndruk(heg_aan([1, 2, 3], 4))  // [1, 2, 3, 4]\n```",
+                            "**heg_aan** (funksie)\n\nVoeg 'n element aan die einde van 'n lys (append).\n\n```arkaan\ndruk(heg_aan([1, 2, 3], 4))  // [1, 2, 3, 4]\n```",
                             "Append element to list"
                         )),
                         "ketting" => Some((
-                            "**ketting** (funksie)\n\nVoeg twee lyste saam (concatenate).\n\n```arcane\ndruk(ketting([1, 2], [3, 4]))  // [1, 2, 3, 4]\n```",
+                            "**ketting** (funksie)\n\nVoeg twee lyste saam (concatenate).\n\n```arkaan\ndruk(ketting([1, 2], [3, 4]))  // [1, 2, 3, 4]\n```",
                             "Concatenate two lists"
                         )),
                         "omgekeer" => Some((
-                            "**omgekeer** (funksie)\n\nKeer 'n lys om (reverse).\n\n```arcane\ndruk(omgekeer([1, 2, 3]))  // [3, 2, 1]\n```",
+                            "**omgekeer** (funksie)\n\nKeer 'n lys om (reverse).\n\n```arkaan\ndruk(omgekeer([1, 2, 3]))  // [3, 2, 1]\n```",
                             "Reverse a list"
                         )),
                         _ => None,

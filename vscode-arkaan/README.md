@@ -1,10 +1,10 @@
-# Arcane Language Support for VS Code
+# Arkaan Language Support for VS Code
 
-Syntax highlighting and code snippets for Arcane - 'n Afrikaanse programmeertaal.
+Syntax highlighting and code snippets for Arkaan - 'n Afrikaanse programmeertaal.
 
 ## Features
 
-- Syntax highlighting for `.arc` files
+- Syntax highlighting for `.ark` files
 - Code snippets for common patterns
 - Bracket matching and auto-closing
 - Comment toggling with `Ctrl+/`
@@ -28,14 +28,14 @@ Syntax highlighting and code snippets for Arcane - 'n Afrikaanse programmeertaal
 ### Option 1: Symlink (Development)
 ```bash
 # Linux/macOS
-ln -s /path/to/arcane-lang/vscode-arcane ~/.vscode/extensions/arcane-lang
+ln -s /path/to/arkaan-lang/vscode-arkaan ~/.vscode/extensions/arkaan-lang
 
 # Windows (PowerShell as Admin)
-New-Item -ItemType SymbolicLink -Path "$env:USERPROFILE\.vscode\extensions\arcane-lang" -Target "C:\path\to\arcane-lang\vscode-arcane"
+New-Item -ItemType SymbolicLink -Path "$env:USERPROFILE\.vscode\extensions\arkaan-lang" -Target "C:\path\to\arkaan-lang\vscode-arkaan"
 ```
 
 ### Option 2: Copy
-Copy the `vscode-arcane` folder to your VS Code extensions directory:
+Copy the `vscode-arkaan` folder to your VS Code extensions directory:
 - Linux: `~/.vscode/extensions/`
 - macOS: `~/.vscode/extensions/`
 - Windows: `%USERPROFILE%\.vscode\extensions\`
@@ -44,7 +44,7 @@ Then restart VS Code.
 
 ## Example
 
-```arcane
+```arkaan
 // Bereken die som van 1 tot 10
 stel x = 10
 stel som = 0

@@ -1,8 +1,8 @@
 {
-  "name": "arcane-lang",
-  "displayName": "Arcane Language",
+  "name": "arkaan-lang",
+  "displayName": "Arkaan Language",
   "description": "'n Afrikaanse programmeertaal - Syntax highlighting, snippets, and LSP",
-  "version": "0.4.0",
+  "version": "0.5.0",
   "publisher": "arcane-lang",
   "engines": {
     "vscode": "^1.75.0"
@@ -13,56 +13,56 @@
     "Linters"
   ],
   "activationEvents": [
-    "onLanguage:arcane"
+    "onLanguage:arkaan"
   ],
   "main": "./dist/extension.js",
   "contributes": {
     "languages": [
       {
-        "id": "arcane",
+        "id": "arkaan",
         "aliases": [
-          "Arcane",
-          "arcane"
+          "Arkaan",
+          "arkaan"
         ],
         "extensions": [
-          ".arc"
+          ".ark"
         ],
         "configuration": "./language-configuration.json",
         "icon": {
-          "light": "./icons/arcane.svg",
-          "dark": "./icons/arcane.svg"
+          "light": "./icons/arkaan.svg",
+          "dark": "./icons/arkaan.svg"
         }
       }
     ],
     "grammars": [
       {
-        "language": "arcane",
-        "scopeName": "source.arcane",
-        "path": "./syntaxes/arcane.tmLanguage.json"
+        "language": "arkaan",
+        "scopeName": "source.arkaan",
+        "path": "./syntaxes/arkaan.tmLanguage.json"
       }
     ],
     "snippets": [
       {
-        "language": "arcane",
-        "path": "./snippets/arcane.json"
+        "language": "arkaan",
+        "path": "./snippets/arkaan.json"
       }
     ],
     "configuration": {
       "type": "object",
-      "title": "Arcane",
+      "title": "Arkaan",
       "properties": {
-        "arcane.serverPath": {
+        "arkaan.serverPath": {
           "type": "string",
           "default": "",
-          "description": "Path to the arcane-lsp executable. Leave empty to use the bundled server."
+          "description": "Path to the arkaan-lsp executable. Leave empty to use the bundled server."
         }
       }
     },
     "iconThemes": [
       {
-        "id": "arcane-icons",
-        "label": "Arcane Icons",
-        "path": "./arcane-icon-theme.json"
+        "id": "arkaan-icons",
+        "label": "Arkaan Icons",
+        "path": "./arkaan-icon-theme.json"
       }
     ]
   },
@@ -85,7 +85,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/yourusername/arcane-lang"
+    "url": "https://github.com/yourusername/arkaan-lang"
   },
   "license": "MIT"
 }

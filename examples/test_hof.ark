@@ -63,7 +63,7 @@ druk(filter(leeg_lys, fn(x) x > 0))
 druk(vou(leeg_lys, 0, fn(acc, x) acc + x))
 
 // String lists with HOFs
-laat woorde = ["hallo", "wêreld", "arcane"]
+laat woorde = ["hallo", "wêreld", "arkaan"]
 laat lengtes = kaart(woorde, fn(w) lengte(w))
 druk(lengtes)
 

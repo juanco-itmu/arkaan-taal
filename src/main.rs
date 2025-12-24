@@ -23,7 +23,7 @@ fn main() {
         1 => repl(),
         2 => run_file(&args[1]),
         _ => {
-            eprintln!("Gebruik: arcane [lêer.arc]");
+            eprintln!("Gebruik: arkaan [lêer.ark]");
             std::process::exit(64);
         }
     }
@@ -45,11 +45,11 @@ fn run_file(path: &str) {
 }
 
 fn repl() {
-    println!("Arcane v0.1.0 - 'n Afrikaanse programmeertaal");
+    println!("Arkaan v0.1.0 - 'n Afrikaanse programmeertaal");
     println!("Tik 'verlaat' om te stop.\n");
 
     loop {
-        print!("arcane> ");
+        print!("arkaan> ");
         io::stdout().flush().unwrap();
 
         let mut line = String::new();
