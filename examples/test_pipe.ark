@@ -1,24 +1,33 @@
 // Test pipe operator ->
+// The pipe operator takes the left side and passes it as the first argument to the right side
+// a -> f(b, c) becomes f(a, b, c)
 
 laat getalle = [1, 2, 3, 4, 5]
 
-// Test 1: Single line chained pipes
-laat result = getalle -> kaart(fn(x) x * 2) -> filter(fn(x) x > 4)
+// Basic pipe: getalle -> kop becomes kop(getalle)
+druk(getalle -> kop)
+
+// Pipe with function call: getalle -> kaart(f) becomes kaart(getalle, f)
+druk(getalle -> kaart(fn(x) x * 2))
+
+// Chained pipes work left-to-right
+// getalle -> kaart(f) -> filter(g) becomes filter(kaart(getalle, f), g)
+laat result = getalle -> kaart(fn(x) x * 2) -> filter(fn(x) x > 5)
 druk(result)
 
-// Test 2: Simple pipe
-laat squared = [1, 2, 3] -> kaart(fn(x) x * x)
-druk(squared)
+// Complex pipeline: filter even, square them, sum
+laat som = getalle -> filter(fn(x) x % 2 == 0) -> kaart(fn(x) x * x) -> vou(0, fn(a, x) a + x)
+druk(som)
 
-// Test 3: Bare function
-laat eerste = getalle -> kop
-druk(eerste)
-
-// Test 4: Pipe to lambda
+// Pipe to lambda expression
 laat dubbel = 5 -> (fn(x) x * 2)
 druk(dubbel)
 
-// Test 5: Verify pattern matching with => still works
+// Pipes work with any expression on the left
+laat som_verdubbel = (1 + 2 + 3) -> (fn(x) x * 2)
+druk(som_verdubbel)
+
+// Pattern matching still uses => (not ->)
 laat getal = 2
 laat naam = pas (getal) {
     geval 1 => "een"
@@ -26,7 +35,3 @@ laat naam = pas (getal) {
     geval _ => "ander"
 }
 druk(naam)
-
-// Test 6: Complex pipeline
-laat som = [1, 2, 3, 4, 5] -> filter(fn(x) x % 2 == 0) -> vou(0, fn(a, x) a + x)
-druk(som)
