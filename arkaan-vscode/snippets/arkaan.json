@@ -1,0 +1,196 @@
+{
+  "Immutable Variable": {
+    "prefix": "laat",
+    "body": [
+      "laat ${1:naam} = ${2:waarde}"
+    ],
+    "description": "Verklaar 'n onveranderlike veranderlike"
+  },
+  "Mutable Variable": {
+    "prefix": "laatmut",
+    "body": [
+      "laat mut ${1:naam} = ${2:waarde}"
+    ],
+    "description": "Verklaar 'n veranderlike wat kan verander"
+  },
+  "Variable Declaration": {
+    "prefix": "stel",
+    "body": [
+      "stel ${1:naam} = ${2:waarde}"
+    ],
+    "description": "Verklaar 'n nuwe veranderlike (veranderlik)"
+  },
+  "Function Declaration": {
+    "prefix": "funksie",
+    "body": [
+      "funksie ${1:naam}(${2:params}) {",
+      "\t$0",
+      "}"
+    ],
+    "description": "Definieer 'n funksie"
+  },
+  "Function with Return": {
+    "prefix": "funksiegee",
+    "body": [
+      "funksie ${1:naam}(${2:params}) {",
+      "\tgee ${0:waarde}",
+      "}"
+    ],
+    "description": "Definieer 'n funksie met terugkeer-waarde"
+  },
+  "Lambda Expression": {
+    "prefix": "fn",
+    "body": [
+      "fn(${1:params}) ${2:uitdrukking}"
+    ],
+    "description": "Lambda uitdrukking"
+  },
+  "Lambda Block": {
+    "prefix": "fnblok",
+    "body": [
+      "fn(${1:params}) {",
+      "\t$0",
+      "}"
+    ],
+    "description": "Lambda met blok-liggaam"
+  },
+  "Return Statement": {
+    "prefix": "gee",
+    "body": [
+      "gee ${1:waarde}"
+    ],
+    "description": "Gee waarde terug uit funksie"
+  },
+  "Type Declaration": {
+    "prefix": "tipe",
+    "body": [
+      "tipe ${1:Naam} {",
+      "\t${2:Konstruktor}",
+      "}"
+    ],
+    "description": "Definieer 'n algebraïese datatipe"
+  },
+  "Option Type": {
+    "prefix": "tipeopsie",
+    "body": [
+      "tipe ${1:Opsie} {",
+      "\tNiks",
+      "\tSommige(waarde)",
+      "}"
+    ],
+    "description": "Opsie-tipe (Maybe/Option)"
+  },
+  "Pattern Match": {
+    "prefix": "pas",
+    "body": [
+      "pas(${1:waarde}) {",
+      "\tgeval ${2:patroon} => ${3:resultaat}",
+      "\tgeval _ => ${0:standaard}",
+      "}"
+    ],
+    "description": "Patroon-passing uitdrukking"
+  },
+  "Match Case": {
+    "prefix": "geval",
+    "body": [
+      "geval ${1:patroon} => ${0:resultaat}"
+    ],
+    "description": "Patroon arm in pas-uitdrukking"
+  },
+  "Print Statement": {
+    "prefix": "druk",
+    "body": [
+      "druk(${1:waarde})"
+    ],
+    "description": "Druk 'n waarde na die konsole"
+  },
+  "If Statement": {
+    "prefix": "as",
+    "body": [
+      "as ${1:voorwaarde} {",
+      "\t$0",
+      "}"
+    ],
+    "description": "As-stelling (if statement)"
+  },
+  "If-Else Statement": {
+    "prefix": "asanders",
+    "body": [
+      "as ${1:voorwaarde} {",
+      "\t$2",
+      "} anders {",
+      "\t$0",
+      "}"
+    ],
+    "description": "As-anders-stelling (if-else statement)"
+  },
+  "While Loop": {
+    "prefix": "terwyl",
+    "body": [
+      "terwyl (${1:voorwaarde}) {",
+      "\t$0",
+      "}"
+    ],
+    "description": "Terwyl-lus (while loop)"
+  },
+  "List Literal": {
+    "prefix": "lys",
+    "body": [
+      "[${1:elemente}]"
+    ],
+    "description": "Lys literaal"
+  },
+  "Map Function": {
+    "prefix": "kaart",
+    "body": [
+      "kaart(${1:lys}, fn(${2:x}) ${0:uitdrukking})"
+    ],
+    "description": "Pas funksie op elke element toe"
+  },
+  "Filter Function": {
+    "prefix": "filter",
+    "body": [
+      "filter(${1:lys}, fn(${2:x}) ${0:voorwaarde})"
+    ],
+    "description": "Filtreer lys met predikaat"
+  },
+  "Fold Function": {
+    "prefix": "vou",
+    "body": [
+      "vou(${1:lys}, ${2:begin}, fn(${3:acc}, ${4:x}) ${0:uitdrukking})"
+    ],
+    "description": "Vou lys tot enkele waarde"
+  },
+  "For Each": {
+    "prefix": "virelk",
+    "body": [
+      "vir_elk(${1:lys}, fn(${2:x}) {",
+      "\t$0",
+      "})"
+    ],
+    "description": "Voer aksie uit vir elke element"
+  },
+  "Tail Recursive Function": {
+    "prefix": "tailrec",
+    "body": [
+      "funksie ${1:naam}(${2:n}, ${3:acc}) {",
+      "\tas ${4:basisgeval} {",
+      "\t\tgee ${3:acc}",
+      "\t} anders {",
+      "\t\tgee ${1:naam}(${5:n - 1}, ${0:nuwe_acc})",
+      "\t}",
+      "}"
+    ],
+    "description": "Stert-rekursiewe funksie (tail recursive)"
+  },
+  "True": {
+    "prefix": "waar",
+    "body": "waar",
+    "description": "Boolean waar (true)"
+  },
+  "False": {
+    "prefix": "vals",
+    "body": "vals",
+    "description": "Boolean vals (false)"
+  }
+}

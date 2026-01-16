@@ -1,0 +1,92 @@
+{
+  "name": "arkaan-lang",
+  "displayName": "Arkaan Language",
+  "description": "'n Afrikaanse programmeertaal - Syntax highlighting, snippets, and LSP",
+  "version": "0.7.0",
+  "publisher": "arcane-lang",
+  "engines": {
+    "vscode": "^1.75.0"
+  },
+  "categories": [
+    "Programming Languages",
+    "Snippets",
+    "Linters"
+  ],
+  "activationEvents": [
+    "onLanguage:arkaan"
+  ],
+  "main": "./dist/extension.js",
+  "contributes": {
+    "languages": [
+      {
+        "id": "arkaan",
+        "aliases": [
+          "Arkaan",
+          "arkaan"
+        ],
+        "extensions": [
+          ".ark"
+        ],
+        "configuration": "./language-configuration.json",
+        "icon": {
+          "light": "./icons/arkaan.svg",
+          "dark": "./icons/arkaan.svg"
+        }
+      }
+    ],
+    "grammars": [
+      {
+        "language": "arkaan",
+        "scopeName": "source.arkaan",
+        "path": "./syntaxes/arkaan.tmLanguage.json"
+      }
+    ],
+    "snippets": [
+      {
+        "language": "arkaan",
+        "path": "./snippets/arkaan.json"
+      }
+    ],
+    "configuration": {
+      "type": "object",
+      "title": "Arkaan",
+      "properties": {
+        "arkaan.serverPath": {
+          "type": "string",
+          "default": "",
+          "description": "Path to the arkaan-lsp executable. Leave empty to use the bundled server."
+        }
+      }
+    },
+    "iconThemes": [
+      {
+        "id": "arkaan-icons",
+        "label": "Arkaan Icons",
+        "path": "./arkaan-icon-theme.json"
+      }
+    ]
+  },
+  "scripts": {
+    "vscode:prepublish": "npm run esbuild-base -- --minify",
+    "compile": "tsc -p ./",
+    "watch": "tsc -watch -p ./",
+    "esbuild-base": "esbuild ./src/extension.ts --bundle --outfile=dist/extension.js --external:vscode --format=cjs --platform=node",
+    "esbuild": "npm run esbuild-base -- --sourcemap",
+    "esbuild-watch": "npm run esbuild-base -- --sourcemap --watch"
+  },
+  "dependencies": {
+    "vscode-languageclient": "^9.0.1"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "@types/vscode": "^1.75.0",
+    "esbuild": "^0.27.2",
+    "typescript": "^5.0.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/yourusername/arkaan-lang"
+  },
+  "license": "Proprietary",
+  "icon": "icons/arkaan.png"
+}
