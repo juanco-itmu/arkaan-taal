@@ -29,7 +29,7 @@ tipe Boom {
 
 laat boom = Tak(Blaar(1), Blaar(2))
 
-funksie som(b) {
+laat som = fn(b) {
     gee pas(b) {
         geval Blaar(n) => n
         geval Tak(l, r) => som(l) + som(r)

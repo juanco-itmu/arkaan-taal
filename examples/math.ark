@@ -1,19 +1,19 @@
 // math.ark - a module with math functions
 
-verskaf funksie add(a, b) {
+verskaf laat add = fn(a, b) {
     gee a + b
 }
 
-verskaf funksie subtract(a, b) {
+verskaf laat subtract = fn(a, b) {
     gee a - b
 }
 
-verskaf funksie multiply(a, b) {
+verskaf laat multiply = fn(a, b) {
     gee a * b
 }
 
 // Private helper - not exported
-funksie internal_helper() {
+laat internal_helper = fn() {
     gee 42
 }
 

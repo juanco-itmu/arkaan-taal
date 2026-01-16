@@ -1,6 +1,8 @@
 // Dit is 'n Arkaan program
-// Bereken die som van 1 tot 10
+// 'n Eenvoudige voorbeeld
 
-stel abc = 50
-556465
-druk(abc)
+laat boodskap = "Hallo, Wêreld!"
+druk(boodskap)
+
+laat getal = 42
+druk("Die antwoord is: " + getal)

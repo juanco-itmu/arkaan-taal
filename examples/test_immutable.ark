@@ -1,30 +1,43 @@
-// Test immutable bindings with laat
+// Test immutable bindings
+// All bindings in Arkaan are immutable (constants)
 
-// laat creates immutable binding
+// laat creates an immutable binding
 laat x = 10
 druk(x)
 
-// This should fail: trying to reassign immutable variable
-// x = 20
-// druk(x)
-
-// stel creates mutable binding
-stel y = 10
-druk(y)
-y = 20
-druk(y)
-
-// Functions in scope are also immutable
-funksie groet(naam) {
-    druk("Hallo, " + naam)
+// Shadowing in inner scopes is allowed
+{
+    laat x = 20
+    druk(x)  // 20 (inner scope)
 }
-groet("Wereld")
+druk(x)  // 10 (original value)
 
-// Function parameters are immutable
-funksie probeer(x) {
-    // x = 42  // Would fail: cannot reassign immutable parameter
-    druk(x)
+// Functions can shadow outer variables
+laat demonstreer = fn() {
+    laat x = 30
+    druk(x)  // 30 (function scope)
+}
+demonstreer()
+druk(x)  // 10 (still original)
+
+// Function parameters are also immutable
+laat probeer = fn(n) {
+    // n = 42  // Would fail: cannot reassign immutable parameter
+    druk(n)
 }
 probeer(100)
+
+// Nested scopes with shadowing
+laat naam = "buite"
+{
+    laat naam = "binne"
+    druk(naam)  // binne
+    {
+        laat naam = "diep binne"
+        druk(naam)  // diep binne
+    }
+    druk(naam)  // binne
+}
+druk(naam)  // buite
 
 druk("Toets geslaag!")

@@ -1,0 +1,108 @@
+// Basiese Arkaan voorbeelde
+// Basic Arkaan examples
+
+// === Arithmetic ===
+laat a = 10
+laat b = 3
+druk("Arithmetic:")
+druk("10 + 3 = " + (a + b))
+druk("10 - 3 = " + (a - b))
+druk("10 * 3 = " + (a * b))
+druk("10 / 3 = " + (a / b))
+druk("10 % 3 = " + (a % b))
+
+// Negative numbers
+laat negatief = -5
+druk("Negative: " + negatief)
+druk("Negation: " + (-negatief))
+
+// === Booleans ===
+druk("")
+druk("Booleans:")
+laat ja = waar
+laat nee = vals
+druk("waar = " + ja)
+druk("vals = " + nee)
+
+// Logical operators
+druk("waar && waar = " + (waar && waar))
+druk("waar && vals = " + (waar && vals))
+druk("waar || vals = " + (waar || vals))
+druk("vals || vals = " + (vals || vals))
+druk("!waar = " + (!waar))
+druk("!vals = " + (!vals))
+
+// Comparison operators
+druk("")
+druk("Comparisons:")
+druk("5 == 5: " + (5 == 5))
+druk("5 != 3: " + (5 != 3))
+druk("5 > 3: " + (5 > 3))
+druk("5 < 3: " + (5 < 3))
+druk("5 >= 5: " + (5 >= 5))
+druk("3 <= 5: " + (3 <= 5))
+
+// === Conditionals (as/anders) ===
+druk("")
+druk("Conditionals:")
+
+laat getal = 7
+
+// if-else statement
+as getal > 5 {
+    druk("getal is groter as 5")
+} anders {
+    druk("getal is nie groter as 5 nie")
+}
+
+// Another if-else
+as getal % 2 == 0 {
+    druk("getal is ewe")
+} anders {
+    druk("getal is onewe")
+}
+
+// if as expression (ternary)
+laat status = as getal > 0 "positief" anders "negatief of nul"
+druk("Status: " + status)
+
+// Nested conditionals
+laat telling = 85
+as telling >= 90 {
+    druk("A")
+} anders {
+    as telling >= 80 {
+        druk("B")
+    } anders {
+        as telling >= 70 {
+            druk("C")
+        } anders {
+            druk("F")
+        }
+    }
+}
+
+// === Recursion (functional approach to loops) ===
+druk("")
+druk("Recursion:")
+
+// Count from 1 to 5 using recursion
+druk("Counting 1 to 5:")
+laat tel_op = fn(n, maks) {
+    as n <= maks {
+        druk(n)
+        tel_op(n + 1, maks)
+    } anders {
+        0
+    }
+}
+tel_op(1, 5)
+
+// Sum using recursion
+laat som_tot = fn(n) {
+    gee 0 as n <= 0 anders n + som_tot(n - 1)
+}
+druk("Som van 1 tot 10: " + som_tot(10))
+
+druk("")
+druk("Klaar!")

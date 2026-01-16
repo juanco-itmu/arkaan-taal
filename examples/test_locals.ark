@@ -1,10 +1,10 @@
 // Test global variables
-stel x = 10
+laat x = 10
 druk(x)
 
 // Test local variables in a block
 {
-    stel y = 20
+    laat y = 20
     druk(y)
     druk(x + y)
 }
@@ -14,9 +14,9 @@ druk(x)
 
 // Nested scopes
 {
-    stel a = 1
+    laat a = 1
     {
-        stel b = 2
+        laat b = 2
         druk(a + b)
     }
     // b is out of scope here
@@ -24,9 +24,9 @@ druk(x)
 }
 
 // Variable shadowing
-stel naam = "buite"
+laat naam = "buite"
 {
-    stel naam = "binne"
+    laat naam = "binne"
     druk(naam)
 }
 druk(naam)

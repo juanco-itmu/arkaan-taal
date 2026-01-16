@@ -1,7 +1,7 @@
 // Test Tail Call Optimization
 
 // Tail-recursive factorial
-funksie faktoriaal(n, acc) {
+laat faktoriaal = fn(n, acc) {
     as n <= 1 {
         gee acc
     } anders {
@@ -13,7 +13,7 @@ druk(faktoriaal(5, 1))   // 120
 druk(faktoriaal(10, 1))  // 3628800
 
 // Tail-recursive sum
-funksie som(n, acc) {
+laat som = fn(n, acc) {
     as n <= 0 {
         gee acc
     } anders {
@@ -24,7 +24,7 @@ funksie som(n, acc) {
 druk(som(100, 0))  // 5050
 
 // Test deep recursion - would stack overflow without TCO
-funksie tel_af(n) {
+laat tel_af = fn(n) {
     as n <= 0 {
         gee "klaar!"
     } anders {
@@ -46,7 +46,7 @@ laat vermenigvuldig = fn(n, acc) {
 druk(vermenigvuldig(6, 1))  // 720
 
 // Mutual recursion (indirect tail calls)
-funksie is_ewe(n) {
+laat is_ewe = fn(n) {
     as n == 0 {
         gee waar
     } anders {
@@ -54,7 +54,7 @@ funksie is_ewe(n) {
     }
 }
 
-funksie is_onewe(n) {
+laat is_onewe = fn(n) {
     as n == 0 {
         gee vals
     } anders {

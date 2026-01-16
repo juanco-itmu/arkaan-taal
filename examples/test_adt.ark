@@ -63,7 +63,7 @@ laat kleure = [Rooi(), Groen(), Blou()]
 druk(kleure)
 
 // ADTs as function arguments and return values
-funksie maak_opsie(x) {
+laat maak_opsie = fn(x) {
     as x > 0 {
         gee Sommige(x)
     } anders {

@@ -1,20 +1,20 @@
 // Test basic function
-funksie groet(naam) {
+laat groet = fn(naam) {
     druk("Hallo, " + naam)
 }
 
 groet("Wereld")
 
 // Test function with return value
-funksie som(a, b) {
+laat som = fn(a, b) {
     gee a + b
 }
 
-stel resultaat = som(3, 4)
+laat resultaat = som(3, 4)
 druk("3 + 4 = " + resultaat)
 
 // Test recursion (factorial)
-funksie fakulteit(n) {
+laat fakulteit = fn(n) {
     as n <= 1 {
         gee 1
     }
@@ -24,11 +24,11 @@ funksie fakulteit(n) {
 druk("5! = " + fakulteit(5))
 
 // Test nested calls
-funksie dubbel(x) {
+laat dubbel = fn(x) {
     gee x * 2
 }
 
-funksie verdubbel_som(a, b) {
+laat verdubbel_som = fn(a, b) {
     gee dubbel(som(a, b))
 }
 
