@@ -10,14 +10,16 @@ enum TokenType {
     // Functional keywords
     Funksie, Fn, Gee, Laat,
     // Pattern matching
-    Pas, Geval, Tipe,
+    Pas, Geval, Tipe, Of,
+    // Module keywords
+    Laai, Verskaf,
     // Literals and identifiers
     Number(f64), Str(String), Identifier(String),
     // Operators
     Plus, Minus, Star, Slash, Percent,
     Equal, EqualEqual, Bang, BangEqual,
     Less, LessEqual, Greater, GreaterEqual,
-    And, Or, Arrow,
+    And, Or, Arrow, FatArrow,
     // Delimiters
     LeftParen, RightParen, LeftBrace, RightBrace,
     LeftBracket, RightBracket, Comma, Underscore,
@@ -90,7 +92,14 @@ impl Lexer {
             ']' => self.add_token(TokenType::RightBracket),
             ',' => self.add_token(TokenType::Comma),
             '+' => self.add_token(TokenType::Plus),
-            '-' => self.add_token(TokenType::Minus),
+            '-' => {
+                let token = if self.match_char('>') {
+                    TokenType::Arrow
+                } else {
+                    TokenType::Minus
+                };
+                self.add_token(token);
+            }
             '*' => self.add_token(TokenType::Star),
             '%' => self.add_token(TokenType::Percent),
             '/' => {
@@ -106,7 +115,7 @@ impl Lexer {
                 let token = if self.match_char('=') {
                     TokenType::EqualEqual
                 } else if self.match_char('>') {
-                    TokenType::Arrow
+                    TokenType::FatArrow
                 } else {
                     TokenType::Equal
                 };
@@ -210,6 +219,10 @@ impl Lexer {
             "pas" => TokenType::Pas,
             "geval" => TokenType::Geval,
             "tipe" => TokenType::Tipe,
+            "of" => TokenType::Of,
+            // Module keywords
+            "laai" => TokenType::Laai,
+            "verskaf" => TokenType::Verskaf,
             // Wildcard
             "_" => TokenType::Underscore,
             _ => TokenType::Identifier(lexeme.clone()),
@@ -335,11 +348,21 @@ fn parse_for_diagnostics(tokens: &[Token]) -> Vec<Diagnostic> {
     // First pass: collect all declared constants
     let mut j = 0;
     while j < tokens.len() {
-        // Track 'laat' declarations
+        // Track 'laat' declarations (including 'verskaf laat')
         if matches!(tokens[j].token_type, TokenType::Laat) {
             if j + 1 < tokens.len() {
                 if let TokenType::Identifier(name) = &tokens[j + 1].token_type {
                     declared_vars.insert(name.clone());
+                }
+            }
+        }
+        // Track 'verskaf laat' declarations
+        if matches!(tokens[j].token_type, TokenType::Verskaf) {
+            if j + 1 < tokens.len() && matches!(tokens[j + 1].token_type, TokenType::Laat) {
+                if j + 2 < tokens.len() {
+                    if let TokenType::Identifier(name) = &tokens[j + 2].token_type {
+                        declared_vars.insert(name.clone());
+                    }
                 }
             }
         }
@@ -364,7 +387,7 @@ fn parse_for_diagnostics(tokens: &[Token]) -> Vec<Diagnostic> {
         // For 'geval' pattern matching - collect pattern bindings (identifiers between geval and =>)
         if matches!(tokens[j].token_type, TokenType::Geval) {
             let mut k = j + 1;
-            while k < tokens.len() && !matches!(tokens[k].token_type, TokenType::Arrow) {
+            while k < tokens.len() && !matches!(tokens[k].token_type, TokenType::FatArrow) {
                 if let TokenType::Identifier(name) = &tokens[k].token_type {
                     // Only add lowercase identifiers (not constructors which start uppercase)
                     if name.chars().next().map(|c| c.is_lowercase()).unwrap_or(false) {
@@ -427,7 +450,7 @@ fn parse_for_diagnostics(tokens: &[Token]) -> Vec<Diagnostic> {
         if matches!(token.token_type, TokenType::Geval) {
             in_pattern = true;
         }
-        if matches!(token.token_type, TokenType::Arrow) {
+        if matches!(token.token_type, TokenType::FatArrow) {
             in_pattern = false;
         }
 
