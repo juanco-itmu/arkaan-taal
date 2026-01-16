@@ -61,6 +61,20 @@
     ],
     "description": "Gee waarde terug uit funksie"
   },
+  "Conditional Return (Guard)": {
+    "prefix": "geeas",
+    "body": [
+      "gee ${1:waarde} as ${0:voorwaarde}"
+    ],
+    "description": "Voorwaardelike terugkeer - gee waarde terug as voorwaarde waar is"
+  },
+  "Conditional Return (Ternary)": {
+    "prefix": "geeasanders",
+    "body": [
+      "gee ${1:waarde1} as ${2:voorwaarde} anders ${0:waarde2}"
+    ],
+    "description": "Ternêre terugkeer - gee waarde1 as voorwaarde waar is, anders waarde2"
+  },
   "Type Declaration": {
     "prefix": "tipe",
     "body": [

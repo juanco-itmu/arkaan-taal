@@ -785,7 +785,7 @@ pub fn get_hover_info(text: &str, position: Position) -> Option<Hover> {
                     "Create function expression"
                 )),
                 TokenType::Gee => Some((
-                    "**gee** (sleutelwoord)\n\nGee 'n waarde terug uit 'n funksie.\n\n```arkaan\nlaat kwadraat = fn(x) {\n    gee x * x\n}\n```",
+                    "**gee** (sleutelwoord)\n\nGee 'n waarde terug uit 'n funksie.\n\n```arkaan\nlaat kwadraat = fn(x) {\n    gee x * x\n}\n```\n\n**Voorwaardelike terugkeer (guard clause):**\n\n```arkaan\ngee waarde as voorwaarde\n```\n\nGee `waarde` terug as die voorwaarde waar is, anders gaan voort.\n\n```arkaan\nlaat fib = fn(n) {\n    gee n as n <= 1\n    gee fib(n - 1) + fib(n - 2)\n}\n```\n\n**Met anders (ternêre terugkeer):**\n\n```arkaan\ngee waarde1 as voorwaarde anders waarde2\n```\n\n```arkaan\nlaat abs = fn(x) {\n    gee -x as x < 0 anders x\n}\n```",
                     "Return value from function"
                 )),
                 TokenType::Laat => Some((
@@ -903,6 +903,22 @@ pub fn get_completions(text: &str, position: Position) -> Vec<CompletionItem> {
             kind: Some(CompletionItemKind::KEYWORD),
             detail: Some("Gee waarde terug".to_string()),
             insert_text: Some("gee ${0}".to_string()),
+            insert_text_format: Some(InsertTextFormat::SNIPPET),
+            ..Default::default()
+        },
+        CompletionItem {
+            label: "gee...as".to_string(),
+            kind: Some(CompletionItemKind::KEYWORD),
+            detail: Some("Voorwaardelike terugkeer (guard)".to_string()),
+            insert_text: Some("gee ${1:waarde} as ${0:voorwaarde}".to_string()),
+            insert_text_format: Some(InsertTextFormat::SNIPPET),
+            ..Default::default()
+        },
+        CompletionItem {
+            label: "gee...as...anders".to_string(),
+            kind: Some(CompletionItemKind::KEYWORD),
+            detail: Some("Ternêre terugkeer".to_string()),
+            insert_text: Some("gee ${1:waarde1} as ${2:voorwaarde} anders ${0:waarde2}".to_string()),
             insert_text_format: Some(InsertTextFormat::SNIPPET),
             ..Default::default()
         },

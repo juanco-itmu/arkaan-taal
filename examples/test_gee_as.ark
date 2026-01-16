@@ -1,22 +1,15 @@
 // Test gee as (conditional return)
-// Syntax: gee (then_value) as (condition) anders (else_value)
+// Syntax: gee value as condition [anders else_value]
 
-// Basic test
-laat test = fn(n) {
-    gee 100 as n == 0 anders 200
-}
-
-druk(test(0))
-druk(test(1))
-
-// Fibonacci using conditional return
+// Guard clause - return early if condition is true
 laat fib = fn(n) {
-    gee n as n <= 1 anders fib(n - 1) + fib(n - 2)
+    gee n as n <= 1
+    gee fib(n - 1) + fib(n - 2)
 }
 
 druk(fib(10))
 
-// Absolute value
+// With anders - ternary return
 laat abs = fn(x) {
     gee -x as x < 0 anders x
 }
@@ -24,10 +17,22 @@ laat abs = fn(x) {
 druk(abs(-5))
 druk(abs(5))
 
-// Max function
-laat max = fn(a, b) {
-    gee a as a > b anders b
+// Guard clause for validation
+laat divide = fn(a, b) {
+    gee 0 as b == 0
+    gee a / b
 }
 
-druk(max(3, 7))
-druk(max(10, 2))
+druk(divide(10, 2))
+druk(divide(10, 0))
+
+// Multiple guards
+laat classify = fn(n) {
+    gee "negatief" as n < 0
+    gee "nul" as n == 0
+    gee "positief"
+}
+
+druk(classify(-5))
+druk(classify(0))
+druk(classify(10))

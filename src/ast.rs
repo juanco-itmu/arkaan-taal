@@ -115,11 +115,11 @@ pub enum Stmt {
     Return {
         value: Option<Expr>,
     },
-    // Conditional return: gee then_value as condition anders else_value
+    // Conditional return: gee value as condition [anders else_value]
     ReturnIf {
-        then_value: Expr,
+        value: Expr,
         condition: Expr,
-        else_value: Expr,
+        else_value: Option<Expr>,
     },
     // Type declaration (ADT)
     TypeDecl {

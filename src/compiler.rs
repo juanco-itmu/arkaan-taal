@@ -347,7 +347,7 @@ impl Compiler {
                 }
             }
             Stmt::ReturnIf {
-                then_value,
+                value,
                 condition,
                 else_value,
             } => {
@@ -358,30 +358,33 @@ impl Compiler {
                 // Compile condition
                 self.compile_expr(condition)?;
 
-                // Jump to else branch if condition is false
-                let else_jump = self.emit(OpCode::JumpIfFalse(0));
+                // Jump past return if condition is false
+                let skip_jump = self.emit(OpCode::JumpIfFalse(0));
                 self.emit(OpCode::Pop); // Pop condition
 
-                // Compile then_value and return
-                if let Expr::Call { callee, arguments } = then_value {
+                // Compile value and return
+                if let Expr::Call { callee, arguments } = value {
                     self.compile_tail_call(callee, arguments)?;
                 } else {
-                    self.compile_expr(then_value)?;
+                    self.compile_expr(value)?;
                     self.emit(OpCode::Return);
                 }
 
-                // Patch jump to else branch
-                let else_offset = self.current_offset();
-                self.current.chunk.patch_jump(else_jump, else_offset);
+                // Patch jump: come here if condition was false
+                let after_return = self.current_offset();
+                self.current.chunk.patch_jump(skip_jump, after_return);
                 self.emit(OpCode::Pop); // Pop condition
 
-                // Compile else_value and return
-                if let Expr::Call { callee, arguments } = else_value {
-                    self.compile_tail_call(callee, arguments)?;
-                } else {
-                    self.compile_expr(else_value)?;
-                    self.emit(OpCode::Return);
+                // If there's an else value, return it
+                if let Some(else_expr) = else_value {
+                    if let Expr::Call { callee, arguments } = else_expr {
+                        self.compile_tail_call(callee, arguments)?;
+                    } else {
+                        self.compile_expr(else_expr)?;
+                        self.emit(OpCode::Return);
+                    }
                 }
+                // If no else, execution continues to next statement
             }
             Stmt::TypeDecl { name, constructors } => {
                 // For each constructor, create a TypeConstructor value and define it as a global

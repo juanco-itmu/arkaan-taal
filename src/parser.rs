@@ -178,15 +178,22 @@ impl Parser {
         // Parse the first expression (could be simple return value or then_value for conditional)
         let first_expr = self.expression()?;
 
-        // Check for conditional return: gee (then_value) as (condition) anders (else_value)
+        // Check for conditional return: gee value as condition [anders else_value]
         if self.check(&TokenType::As) {
             self.advance();
-            let condition = self.expression()?;
-            self.consume(&TokenType::Anders, "Verwag 'anders' in 'gee...as...anders' uitdrukking.")?;
-            let else_value = self.expression()?;
+            let condition = self.or()?;  // Use or() to stop before 'anders'
+
+            // Optional anders clause
+            let else_value = if self.check(&TokenType::Anders) {
+                self.advance();
+                Some(self.expression()?)
+            } else {
+                None
+            };
+
             self.consume_newline_or_eof()?;
             return Ok(Stmt::ReturnIf {
-                then_value: first_expr,
+                value: first_expr,
                 condition,
                 else_value,
             });
