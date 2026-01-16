@@ -1,16 +1,50 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
-  <!-- Background circle -->
-  <circle cx="16" cy="16" r="14" fill="#1e1e2e"/>
+<svg width="256" height="256" viewBox="0 0 256 256" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <radialGradient id="arcaneGlow" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#cce9ff"></stop>
+      <stop offset="60%" stop-color="#7fc8ff"></stop>
+      <stop offset="100%" stop-color="#3aa0ff"></stop>
+    </radialGradient>
 
-  <!-- Outer ring -->
-  <circle cx="16" cy="16" r="12" fill="none" stroke="#9d4edd" stroke-width="1.5"/>
+    <linearGradient id="runeStroke" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#e6f4ff"></stop>
+      <stop offset="100%" stop-color="#6bb8ff"></stop>
+    </linearGradient>
+  </defs>
 
-  <!-- Inner mystical symbol - stylized "A" for Arkaan -->
-  <path d="M16 6 L22 24 L19 24 L17.5 19 L14.5 19 L13 24 L10 24 L16 6Z" fill="#c77dff"/>
-  <path d="M15 15 L17 15 L16 11 Z" fill="#1e1e2e"/>
+  <!-- Outer arcane circle -->
+  <circle cx="128" cy="128" r="108" fill="none" stroke="url(#runeStroke)" stroke-width="8"></circle>
 
-  <!-- Sparkle accents -->
-  <circle cx="8" cy="10" r="1" fill="#e0aaff"/>
-  <circle cx="24" cy="12" r="0.8" fill="#e0aaff"/>
-  <circle cx="22" cy="22" r="0.6" fill="#e0aaff"/>
+  <!-- Inner glow -->
+  <circle cx="128" cy="128" r="92" fill="url(#arcaneGlow)" opacity="0.15"></circle>
+
+  <!-- Arcane runes (ticks) -->
+  <g stroke="#9dd7ff" stroke-width="6" stroke-linecap="round">
+    <line x1="128" y1="20" x2="128" y2="36"></line>
+    <line x1="128" y1="220" x2="128" y2="236"></line>
+    <line x1="20" y1="128" x2="36" y2="128"></line>
+    <line x1="220" y1="128" x2="236" y2="128"></line>
+
+    <line x1="48" y1="48" x2="60" y2="60"></line>
+    <line x1="208" y1="48" x2="196" y2="60"></line>
+    <line x1="48" y1="208" x2="60" y2="196"></line>
+    <line x1="208" y1="208" x2="196" y2="196"></line>
+  </g>
+
+  <!-- Central arcane star / intellect glyph -->
+  <g fill="none" stroke="#cce9ff" stroke-width="8">
+    <polygon points="
+        128,56
+        148,108
+        200,128
+        148,148
+        128,200
+        108,148
+        56,128
+        108,108
+      " stroke-linejoin="round"></polygon>
+  </g>
+
+  <!-- Core focus -->
+  <circle cx="128" cy="128" r="12" fill="#e6f4ff"></circle>
 </svg>
