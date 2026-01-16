@@ -1,0 +1,33 @@
+// Test gee as (conditional return)
+// Syntax: gee (then_value) as (condition) anders (else_value)
+
+// Basic test
+laat test = fn(n) {
+    gee 100 as n == 0 anders 200
+}
+
+druk(test(0))
+druk(test(1))
+
+// Fibonacci using conditional return
+laat fib = fn(n) {
+    gee n as n <= 1 anders fib(n - 1) + fib(n - 2)
+}
+
+druk(fib(10))
+
+// Absolute value
+laat abs = fn(x) {
+    gee -x as x < 0 anders x
+}
+
+druk(abs(-5))
+druk(abs(5))
+
+// Max function
+laat max = fn(a, b) {
+    gee a as a > b anders b
+}
+
+druk(max(3, 7))
+druk(max(10, 2))

@@ -19,5 +19,6 @@
     "titleBar.inactiveForeground": "#e7e7e799"
   },
   "peacock.remoteColor": "#007fff",
-  "arkaan.serverPath": "/home/juanco/arcane-lang/target/release/arkaan-lsp"
+  "arkaan.serverPath": "/home/juanco/arcane-lang/target/release/arkaan-lsp",
+  "cSpell.words": ["druk", "laat", "positief"]
 }

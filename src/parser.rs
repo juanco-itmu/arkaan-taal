@@ -169,14 +169,32 @@ impl Parser {
     }
 
     fn return_statement(&mut self) -> Result<Stmt, String> {
-        let value = if self.check(&TokenType::Newline) || self.is_at_end() || self.check(&TokenType::RightBrace) {
-            None
-        } else {
-            Some(self.expression()?)
-        };
+        // Check for empty return
+        if self.check(&TokenType::Newline) || self.is_at_end() || self.check(&TokenType::RightBrace) {
+            self.consume_newline_or_eof()?;
+            return Ok(Stmt::Return { value: None });
+        }
 
+        // Parse the first expression (could be simple return value or then_value for conditional)
+        let first_expr = self.expression()?;
+
+        // Check for conditional return: gee (then_value) as (condition) anders (else_value)
+        if self.check(&TokenType::As) {
+            self.advance();
+            let condition = self.expression()?;
+            self.consume(&TokenType::Anders, "Verwag 'anders' in 'gee...as...anders' uitdrukking.")?;
+            let else_value = self.expression()?;
+            self.consume_newline_or_eof()?;
+            return Ok(Stmt::ReturnIf {
+                then_value: first_expr,
+                condition,
+                else_value,
+            });
+        }
+
+        // Simple return
         self.consume_newline_or_eof()?;
-        Ok(Stmt::Return { value })
+        Ok(Stmt::Return { value: Some(first_expr) })
     }
 
     fn print_statement(&mut self) -> Result<Stmt, String> {

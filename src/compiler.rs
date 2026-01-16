@@ -13,7 +13,7 @@ const CTOR_HIDDEN_LOCAL: &str = "$ctor";
 struct Local {
     name: String,
     depth: usize,
-    is_captured: bool,  // True if this local is captured by a closure
+    is_captured: bool, // True if this local is captured by a closure
 }
 
 #[derive(Debug, Clone)]
@@ -39,7 +39,7 @@ struct FunctionCompiler {
     function_type: FunctionType,
     chunk: Chunk,
     locals: Vec<Local>,
-    upvalues: Vec<CompilerUpvalue>,  // Captured variables
+    upvalues: Vec<CompilerUpvalue>, // Captured variables
     scope_depth: usize,
     arity: usize,
 }
@@ -181,7 +181,9 @@ impl Compiler {
         }
 
         // Add new upvalue
-        self.current.upvalues.push(CompilerUpvalue { index, is_local });
+        self.current
+            .upvalues
+            .push(CompilerUpvalue { index, is_local });
         self.current.upvalues.len() - 1
     }
 
@@ -344,6 +346,43 @@ impl Compiler {
                     self.emit(OpCode::Return);
                 }
             }
+            Stmt::ReturnIf {
+                then_value,
+                condition,
+                else_value,
+            } => {
+                if self.current.function_type == FunctionType::Script {
+                    return Err("Kan nie buite 'n funksie terugkeer nie.".to_string());
+                }
+
+                // Compile condition
+                self.compile_expr(condition)?;
+
+                // Jump to else branch if condition is false
+                let else_jump = self.emit(OpCode::JumpIfFalse(0));
+                self.emit(OpCode::Pop); // Pop condition
+
+                // Compile then_value and return
+                if let Expr::Call { callee, arguments } = then_value {
+                    self.compile_tail_call(callee, arguments)?;
+                } else {
+                    self.compile_expr(then_value)?;
+                    self.emit(OpCode::Return);
+                }
+
+                // Patch jump to else branch
+                let else_offset = self.current_offset();
+                self.current.chunk.patch_jump(else_jump, else_offset);
+                self.emit(OpCode::Pop); // Pop condition
+
+                // Compile else_value and return
+                if let Expr::Call { callee, arguments } = else_value {
+                    self.compile_tail_call(callee, arguments)?;
+                } else {
+                    self.compile_expr(else_value)?;
+                    self.emit(OpCode::Return);
+                }
+            }
             Stmt::TypeDecl { name, constructors } => {
                 // For each constructor, create a TypeConstructor value and define it as a global
                 for constructor in constructors {
@@ -407,50 +446,48 @@ impl Compiler {
                 left,
                 operator,
                 right,
-            } => {
-                match operator.token_type {
-                    TokenType::And => {
-                        self.compile_expr(*left)?;
-                        let jump = self.emit(OpCode::JumpIfFalse(0));
-                        self.emit(OpCode::Pop);
-                        self.compile_expr(*right)?;
-                        let after = self.current_offset();
-                        self.current.chunk.patch_jump(jump, after);
-                    }
-                    TokenType::Or => {
-                        self.compile_expr(*left)?;
-                        let else_jump = self.emit(OpCode::JumpIfFalse(0));
-                        let end_jump = self.emit(OpCode::Jump(0));
-
-                        let else_branch = self.current_offset();
-                        self.current.chunk.patch_jump(else_jump, else_branch);
-                        self.emit(OpCode::Pop);
-                        self.compile_expr(*right)?;
-
-                        let end = self.current_offset();
-                        self.current.chunk.patch_jump(end_jump, end);
-                    }
-                    _ => {
-                        self.compile_expr(*left)?;
-                        self.compile_expr(*right)?;
-
-                        match operator.token_type {
-                            TokenType::Plus => self.emit(OpCode::Add),
-                            TokenType::Minus => self.emit(OpCode::Subtract),
-                            TokenType::Star => self.emit(OpCode::Multiply),
-                            TokenType::Slash => self.emit(OpCode::Divide),
-                            TokenType::Percent => self.emit(OpCode::Modulo),
-                            TokenType::EqualEqual => self.emit(OpCode::Equal),
-                            TokenType::BangEqual => self.emit(OpCode::NotEqual),
-                            TokenType::Less => self.emit(OpCode::Less),
-                            TokenType::LessEqual => self.emit(OpCode::LessEqual),
-                            TokenType::Greater => self.emit(OpCode::Greater),
-                            TokenType::GreaterEqual => self.emit(OpCode::GreaterEqual),
-                            _ => return Err("Onbekende binêre operator.".to_string()),
-                        };
-                    }
+            } => match operator.token_type {
+                TokenType::And => {
+                    self.compile_expr(*left)?;
+                    let jump = self.emit(OpCode::JumpIfFalse(0));
+                    self.emit(OpCode::Pop);
+                    self.compile_expr(*right)?;
+                    let after = self.current_offset();
+                    self.current.chunk.patch_jump(jump, after);
                 }
-            }
+                TokenType::Or => {
+                    self.compile_expr(*left)?;
+                    let else_jump = self.emit(OpCode::JumpIfFalse(0));
+                    let end_jump = self.emit(OpCode::Jump(0));
+
+                    let else_branch = self.current_offset();
+                    self.current.chunk.patch_jump(else_jump, else_branch);
+                    self.emit(OpCode::Pop);
+                    self.compile_expr(*right)?;
+
+                    let end = self.current_offset();
+                    self.current.chunk.patch_jump(end_jump, end);
+                }
+                _ => {
+                    self.compile_expr(*left)?;
+                    self.compile_expr(*right)?;
+
+                    match operator.token_type {
+                        TokenType::Plus => self.emit(OpCode::Add),
+                        TokenType::Minus => self.emit(OpCode::Subtract),
+                        TokenType::Star => self.emit(OpCode::Multiply),
+                        TokenType::Slash => self.emit(OpCode::Divide),
+                        TokenType::Percent => self.emit(OpCode::Modulo),
+                        TokenType::EqualEqual => self.emit(OpCode::Equal),
+                        TokenType::BangEqual => self.emit(OpCode::NotEqual),
+                        TokenType::Less => self.emit(OpCode::Less),
+                        TokenType::LessEqual => self.emit(OpCode::LessEqual),
+                        TokenType::Greater => self.emit(OpCode::Greater),
+                        TokenType::GreaterEqual => self.emit(OpCode::GreaterEqual),
+                        _ => return Err("Onbekende binêre operator.".to_string()),
+                    };
+                }
+            },
             Expr::Call { callee, arguments } => {
                 // Compile the callee (the function to call)
                 self.compile_expr(*callee)?;
@@ -617,11 +654,14 @@ impl Compiler {
             Pattern::Literal(_) => 0,
             Pattern::Constructor { fields, .. } => {
                 // Count the hidden $ctor local plus all field bindings
-                let field_bindings: usize = fields.iter().map(|p| self.collect_pattern_bindings(p)).sum();
+                let field_bindings: usize = fields
+                    .iter()
+                    .map(|p| self.collect_pattern_bindings(p))
+                    .sum();
                 if fields.is_empty() {
-                    0  // No hidden local for zero-field constructors
+                    0 // No hidden local for zero-field constructors
                 } else {
-                    1 + field_bindings  // 1 for $ctor + field bindings
+                    1 + field_bindings // 1 for $ctor + field bindings
                 }
             }
         }
@@ -635,7 +675,11 @@ impl Compiler {
     /// - For Wildcard: the value is popped
     /// - For Literal: the value is popped
     /// - For Constructor: the constructor is popped, but field bindings remain
-    fn compile_pattern(&mut self, pattern: &Pattern, can_fail: bool) -> Result<Option<usize>, String> {
+    fn compile_pattern(
+        &mut self,
+        pattern: &Pattern,
+        can_fail: bool,
+    ) -> Result<Option<usize>, String> {
         match pattern {
             Pattern::Wildcard => {
                 // Always matches, pop the value
@@ -723,7 +767,11 @@ impl Compiler {
         }
     }
 
-    fn compile_lambda(&mut self, params: Vec<String>, body: LambdaBody) -> Result<(Rc<Chunk>, usize, Vec<UpvalueDescriptor>), String> {
+    fn compile_lambda(
+        &mut self,
+        params: Vec<String>,
+        body: LambdaBody,
+    ) -> Result<(Rc<Chunk>, usize, Vec<UpvalueDescriptor>), String> {
         self.compile_callable(String::from("<lambda>"), params, |compiler| {
             match body {
                 LambdaBody::Expr(expr) => {
@@ -773,7 +821,8 @@ impl Compiler {
     }
 
     fn extract_upvalues(&self) -> Vec<UpvalueDescriptor> {
-        self.current.upvalues
+        self.current
+            .upvalues
             .iter()
             .map(|u| UpvalueDescriptor {
                 index: u.index,
